@@ -147,6 +147,7 @@ namespace AntPlugin
         {
             ToolStripMenuItem menuItem = new ToolStripMenuItem("Ant Window", pluginImage, ShowAntWindow);
             ToolStripMenuItem menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("ViewMenu");
+            PluginBase.MainForm.RegisterShortcutItem("ViewMenu.ShowAntPanel", menuItem);
             menu.DropDownItems.Add(menuItem);
         }
 
