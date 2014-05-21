@@ -15,7 +15,6 @@ namespace AntPlugin
         public const int ICON_DEFAULT_TARGET = 1;
         public const int ICON_INTERNAL_TARGET = 2;
         public const int ICON_PUBLIC_TARGET = 3;
-        
         private PluginMain pluginMain;
         private ContextMenuStrip buildFileMenu;
         private ContextMenuStrip targetMenu;
@@ -70,11 +69,9 @@ namespace AntPlugin
             AntTreeNode node = treeView.SelectedNode as AntTreeNode;
             PluginBase.MainForm.OpenEditableDocument(node.File, false);
             ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
-
             String text = sci.Text;
             Regex regexp = new Regex("<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>");
             Match match = regexp.Match(text);
-
             if (match != null)
             {
                 sci.GotoPos(match.Index);
@@ -210,5 +207,4 @@ namespace AntPlugin
         {
         }
     }
-    
 }
