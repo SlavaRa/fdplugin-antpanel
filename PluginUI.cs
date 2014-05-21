@@ -69,10 +69,8 @@ namespace AntPlugin
             AntTreeNode node = treeView.SelectedNode as AntTreeNode;
             PluginBase.MainForm.OpenEditableDocument(node.File, false);
             ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
-            String text = sci.Text;
-            Regex regexp = new Regex("<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>");
-            Match match = regexp.Match(text);
-            if (match != null)
+            Match match = Regex.Match(sci.Text, "<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>", RegexOptions.Compiled);
+            if (match.Success)
             {
                 sci.GotoPos(match.Index);
                 sci.SetSel(match.Index, match.Index + match.Length);
@@ -89,9 +87,7 @@ namespace AntPlugin
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "BuildFiles (*.xml)|*.XML|" + "All files (*.*)|*.*";
             dialog.Multiselect = true;
-            if (PluginBase.CurrentProject != null)
-                dialog.InitialDirectory = Path.GetDirectoryName(
-                    PluginBase.CurrentProject.ProjectPath);
+            if (PluginBase.CurrentProject != null) dialog.InitialDirectory = Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath);
             if (dialog.ShowDialog() == DialogResult.OK) pluginMain.AddBuildFiles(dialog.FileNames);
         }
 
@@ -114,9 +110,8 @@ namespace AntPlugin
         
         public void RefreshData()
         {
-            Boolean projectExists = (PluginBase.CurrentProject != null);
-            Enabled = projectExists;
-            if (projectExists) FillTree();
+            Enabled = (PluginBase.CurrentProject != null);
+            if (Enabled) FillTree();
             else
             {
                 treeView.Nodes.Clear();
@@ -128,7 +123,7 @@ namespace AntPlugin
         {
             treeView.BeginUpdate();
             treeView.Nodes.Clear();
-            foreach (String file in pluginMain.BuildFilesList)
+            foreach (string file in pluginMain.BuildFilesList)
             {
                 if (File.Exists(file)) treeView.Nodes.Add(GetBuildFileNode(file));
             }
@@ -140,11 +135,11 @@ namespace AntPlugin
             XmlDocument xml = new XmlDocument();
             xml.Load(file);
             XmlAttribute defTargetAttr = xml.DocumentElement.Attributes["default"];
-            String defaultTarget = (defTargetAttr != null) ? defTargetAttr.InnerText : "";
+            string defaultTarget = (defTargetAttr != null) ? defTargetAttr.InnerText : "";
             XmlAttribute nameAttr = xml.DocumentElement.Attributes["name"];
-            String projectName = (nameAttr != null) ? nameAttr.InnerText : file;
+            string projectName = (nameAttr != null) ? nameAttr.InnerText : file;
             XmlAttribute descrAttr = xml.DocumentElement.Attributes["description"];
-            String description = (descrAttr != null) ? descrAttr.InnerText : "";
+            string description = (descrAttr != null) ? descrAttr.InnerText : "";
             if (projectName.Length == 0)
             projectName = file;
             AntTreeNode rootNode = new AntTreeNode(projectName, ICON_FILE);
@@ -162,8 +157,8 @@ namespace AntPlugin
                     XmlAttribute targetNameAttr = child.Attributes["name"];
                     if (targetNameAttr != null)
                     {
-                        String targetName = targetNameAttr.InnerText;
-                        if (!String.IsNullOrEmpty(targetName) && (targetName[0] == '-'))
+                        string targetName = targetNameAttr.InnerText;
+                        if (!string.IsNullOrEmpty(targetName) && (targetName[0] == '-'))
                         {
                             continue;
                         }
@@ -180,9 +175,9 @@ namespace AntPlugin
         private AntTreeNode GetBuildTargetNode(XmlNode node, string defaultTarget)
         {
             XmlAttribute nameAttr = node.Attributes["name"];
-            String targetName = (nameAttr != null) ? nameAttr.InnerText : "";
+            string targetName = (nameAttr != null) ? nameAttr.InnerText : "";
             XmlAttribute descrAttr = node.Attributes["description"];
-            String description = (descrAttr != null) ? descrAttr.InnerText : "";
+            string description = (descrAttr != null) ? descrAttr.InnerText : "";
             AntTreeNode targetNode;
             if (targetName == defaultTarget)
             {
@@ -199,8 +194,8 @@ namespace AntPlugin
 
     internal class AntTreeNode : TreeNode
     {
-        public String File;
-        public String Target;
+        public string File;
+        public string Target;
 
         public AntTreeNode(string text, int imageIndex)
             : base(text, imageIndex, imageIndex)
