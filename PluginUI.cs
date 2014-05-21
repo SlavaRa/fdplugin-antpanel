@@ -29,7 +29,6 @@ namespace AntPlugin
             addButton.Image = PluginBase.MainForm.FindImage("33");
             runButton.Image = PluginBase.MainForm.FindImage("487");
             refreshButton.Image = PluginBase.MainForm.FindImage("66");
-
             CreateMenus();
             RefreshData();
         }
@@ -40,9 +39,7 @@ namespace AntPlugin
             buildFileMenu.Items.Add("Run default target", runButton.Image, MenuRunClick);
             buildFileMenu.Items.Add("Edit file", null, MenuEditClick);
             buildFileMenu.Items.Add(new ToolStripSeparator());
-            buildFileMenu.Items.Add("Remove",
-                   PluginBase.MainForm.FindImage("153"), MenuRemoveClick);
-            
+            buildFileMenu.Items.Add("Remove", PluginBase.MainForm.FindImage("153"), MenuRemoveClick);
             targetMenu = new ContextMenuStrip();
             targetMenu.Items.Add("Run target", runButton.Image, MenuRunClick);
             targetMenu.Items.Add("Show in Editor", null, MenuEditClick);
@@ -54,10 +51,8 @@ namespace AntPlugin
             {
                 AntTreeNode currentNode = treeView.GetNodeAt(e.Location) as AntTreeNode;
                 treeView.SelectedNode = currentNode;
-                if (currentNode.Parent == null)
-                    buildFileMenu.Show(treeView, e.Location);
-                else
-                    targetMenu.Show(treeView, e.Location);
+                if (currentNode.Parent == null) buildFileMenu.Show(treeView, e.Location);
+                else targetMenu.Show(treeView, e.Location);
             }
         }
 
@@ -90,8 +85,7 @@ namespace AntPlugin
 
         private void MenuRemoveClick(object sender, EventArgs e)
         {
-            pluginMain.RemoveBuildFile(
-                (treeView.SelectedNode as AntTreeNode).File);
+            pluginMain.RemoveBuildFile((treeView.SelectedNode as AntTreeNode).File);
         }
         
         private void addButton_Click(object sender, EventArgs e)
@@ -102,11 +96,7 @@ namespace AntPlugin
             if (PluginBase.CurrentProject != null)
                 dialog.InitialDirectory = Path.GetDirectoryName(
                     PluginBase.CurrentProject.ProjectPath);
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                pluginMain.AddBuildFiles(dialog.FileNames);
-            }
+            if (dialog.ShowDialog() == DialogResult.OK) pluginMain.AddBuildFiles(dialog.FileNames);
         }
 
         private void runButton_Click(object sender, EventArgs e)
@@ -114,11 +104,10 @@ namespace AntPlugin
             RunTarget();
         }
 
-        private void RunTarget()
+        public void RunTarget()
         {
             AntTreeNode node = treeView.SelectedNode as AntTreeNode;
-            if (node == null)
-                return;
+            if (node == null) return;
             pluginMain.RunTarget(node.File, node.Target);
         }
 
@@ -131,10 +120,7 @@ namespace AntPlugin
         {
             Boolean projectExists = (PluginBase.CurrentProject != null);
             Enabled = projectExists;
-            if (projectExists)
-            {
-                FillTree();
-            }
+            if (projectExists) FillTree();
             else
             {
                 treeView.Nodes.Clear();
@@ -148,10 +134,7 @@ namespace AntPlugin
             treeView.Nodes.Clear();
             foreach (String file in pluginMain.BuildFilesList)
             {
-                if (File.Exists(file))
-                {
-                    treeView.Nodes.Add(GetBuildFileNode(file));
-                }
+                if (File.Exists(file)) treeView.Nodes.Add(GetBuildFileNode(file));
             }
             treeView.EndUpdate();
         }
@@ -160,24 +143,18 @@ namespace AntPlugin
         {
             XmlDocument xml = new XmlDocument();
             xml.Load(file);
-
             XmlAttribute defTargetAttr = xml.DocumentElement.Attributes["default"];
             String defaultTarget = (defTargetAttr != null) ? defTargetAttr.InnerText : "";
-
             XmlAttribute nameAttr = xml.DocumentElement.Attributes["name"];
             String projectName = (nameAttr != null) ? nameAttr.InnerText : file;
-
             XmlAttribute descrAttr = xml.DocumentElement.Attributes["description"];
             String description = (descrAttr != null) ? descrAttr.InnerText : "";
-
             if (projectName.Length == 0)
             projectName = file;
-
             AntTreeNode rootNode = new AntTreeNode(projectName, ICON_FILE);
             rootNode.File = file;
             rootNode.Target = defaultTarget;
             rootNode.ToolTipText = description;
-
             XmlNodeList nodes = xml.DocumentElement.ChildNodes;
             int nodeCount = nodes.Count;
             for (int i = 0; i < nodeCount; i++)
@@ -195,13 +172,11 @@ namespace AntPlugin
                             continue;
                         }
                     }
-
                     AntTreeNode targetNode = GetBuildTargetNode(child, defaultTarget);
                     targetNode.File = file;
                     rootNode.Nodes.Add(targetNode);
                 }
             }
-
             rootNode.Expand();
             return rootNode;
         }
@@ -210,28 +185,16 @@ namespace AntPlugin
         {
             XmlAttribute nameAttr = node.Attributes["name"];
             String targetName = (nameAttr != null) ? nameAttr.InnerText : "";
-            
             XmlAttribute descrAttr = node.Attributes["description"];
             String description = (descrAttr != null) ? descrAttr.InnerText : "";
-
             AntTreeNode targetNode;
             if (targetName == defaultTarget)
             {
                 targetNode = new AntTreeNode(targetName, ICON_PUBLIC_TARGET);
-                targetNode.NodeFont = new Font(
-                    treeView.Font.Name,
-                    treeView.Font.Size,
-                    FontStyle.Bold);
+                targetNode.NodeFont = new Font(treeView.Font.Name, treeView.Font.Size, FontStyle.Bold);
             }
-            else if (description.Length > 0)
-            {
-                targetNode = new AntTreeNode(targetName, ICON_PUBLIC_TARGET);
-            }
-            else
-            {
-                targetNode = new AntTreeNode(targetName, ICON_INTERNAL_TARGET);
-            }
-
+            else if (description.Length > 0) targetNode = new AntTreeNode(targetName, ICON_PUBLIC_TARGET);
+            else targetNode = new AntTreeNode(targetName, ICON_INTERNAL_TARGET);
             targetNode.Target = targetName;
             targetNode.ToolTipText = description;
             return targetNode;
@@ -250,5 +213,3 @@ namespace AntPlugin
     }
     
 }
-
-

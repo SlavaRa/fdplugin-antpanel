@@ -23,11 +23,7 @@ namespace AntPlugin
 	    private const string SETTINGS_FILE = "Settings.fdb";
         private const string PLUGIN_DESC = "Ant plugin";
         private const string STORAGE_FILE_NAME = "antPluginData.txt";
-        private List<string> buildFilesList = new List<string>();
-        private List<string> BuildFilesList
-        {
-            get { return buildFilesList; }
-        }
+        public List<string> BuildFilesList { get; private set; }
         private string settingFilename;
         private Settings settingObject;
         private DockContent pluginPanel;
@@ -167,7 +163,7 @@ namespace AntPlugin
             pluginPanel.Show();
 	    }
 
-        private void RunTarget(string file, string target)
+        public void RunTarget(string file, string target)
         {
             string command = Environment.SystemDirectory + "\\cmd.exe";
             string arguments = "/c ";
@@ -177,26 +173,26 @@ namespace AntPlugin
 			Globals.MainForm.CallCommand("RunProcessCaptured", command + ";" + arguments);
         }
 
-        private void AddBuildFiles(string[] files)
+        public void AddBuildFiles(string[] files)
         {
             foreach (string file in files)
             {
-                if (!buildFilesList.Contains(file)) buildFilesList.Add(file);
+                if (!BuildFilesList.Contains(file)) BuildFilesList.Add(file);
             }
             SaveBuildFiles();
             pluginUI.RefreshData();
         }
 
-        private void RemoveBuildFile(string file)
+        public void RemoveBuildFile(string file)
         {
-            if (buildFilesList.Contains(file)) buildFilesList.Remove(file);
+            if (BuildFilesList.Contains(file)) BuildFilesList.Remove(file);
             SaveBuildFiles();
             pluginUI.RefreshData();
         }
 
-        private void ReadBuildFiles()
+        public void ReadBuildFiles()
         {
-            buildFilesList.Clear();
+            BuildFilesList.Clear();
             string folder = GetBuildFilesStorageFolder();
             string fullName = folder + "\\" + STORAGE_FILE_NAME;
             if (File.Exists(fullName))
@@ -205,7 +201,7 @@ namespace AntPlugin
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line.Length > 0 && !buildFilesList.Contains(line)) buildFilesList.Add(line);
+                    if (line.Length > 0 && !BuildFilesList.Contains(line)) BuildFilesList.Add(line);
                 }
                 file.Close();
             }
@@ -217,7 +213,7 @@ namespace AntPlugin
             string fullName = folder + "\\" + STORAGE_FILE_NAME;
             if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
             StreamWriter file = new StreamWriter(fullName);
-            foreach (string line in buildFilesList)
+            foreach (string line in BuildFilesList)
             {
                 file.WriteLine(line);
             }
