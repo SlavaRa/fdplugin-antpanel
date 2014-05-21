@@ -15,20 +15,20 @@ namespace AntPlugin
 {
 	public class PluginMain : IPlugin
 	{
-        private const Int32 PLUGIN_API = 1;
-        private const String PLUGIN_NAME = "AntPlugin";
-        private const String PLUGIN_GUID = "92d9a647-6cd3-4347-9db6-95f324292399";
-        private const String PLUGIN_HELP = "www.flashdevelop.org/community/";
-        private const String PLUGIN_AUTH = "Canab";
-	    private const String SETTINGS_FILE = "Settings.fdb";
-        private const String PLUGIN_DESC = "Ant plugin";
-        private const String STORAGE_FILE_NAME = "antPluginData.txt";
-        private List<String> buildFilesList = new List<string>();
-        public List<string> BuildFilesList
+        private const int PLUGIN_API = 1;
+        private const string PLUGIN_NAME = "AntPlugin";
+        private const string PLUGIN_GUID = "92d9a647-6cd3-4347-9db6-95f324292399";
+        private const string PLUGIN_HELP = "www.flashdevelop.org/community/";
+        private const string PLUGIN_AUTH = "Canab";
+	    private const string SETTINGS_FILE = "Settings.fdb";
+        private const string PLUGIN_DESC = "Ant plugin";
+        private const string STORAGE_FILE_NAME = "antPluginData.txt";
+        private List<string> buildFilesList = new List<string>();
+        private List<string> BuildFilesList
         {
             get { return buildFilesList; }
         }
-        private String settingFilename;
+        private string settingFilename;
         private Settings settingObject;
         private DockContent pluginPanel;
 	    private PluginUI pluginUI;
@@ -44,7 +44,7 @@ namespace AntPlugin
         /// <summary>
         /// Name of the plugin
         /// </summary> 
-        public String Name
+        public string Name
 		{
 			get { return PLUGIN_NAME; }
 		}
@@ -52,7 +52,7 @@ namespace AntPlugin
         /// <summary>
         /// GUID of the plugin
         /// </summary>
-        public String Guid
+        public string Guid
 		{
 			get { return PLUGIN_GUID; }
 		}
@@ -60,7 +60,7 @@ namespace AntPlugin
         /// <summary>
         /// Author of the plugin
         /// </summary> 
-        public String Author
+        public string Author
 		{
 			get { return PLUGIN_AUTH; }
 		}
@@ -68,7 +68,7 @@ namespace AntPlugin
         /// <summary>
         /// Description of the plugin
         /// </summary> 
-        public String Description
+        public string Description
 		{
 			get { return PLUGIN_DESC; }
 		}
@@ -76,7 +76,7 @@ namespace AntPlugin
         /// <summary>
         /// Web address for help
         /// </summary> 
-        public String Help
+        public string Help
 		{
 			get { return PLUGIN_HELP; }
 		}
@@ -85,7 +85,7 @@ namespace AntPlugin
         /// Object that contains the settings
         /// </summary>
         [Browsable(false)]
-        public Object Settings
+        public object Settings
         {
             get { return settingObject; }
         }
@@ -122,7 +122,7 @@ namespace AntPlugin
             EventManager.AddEventHandler(this, EventType.Command);
         }
         
-        public void HandleEvent(Object sender, NotifyEvent e, HandlingPriority prority)
+        public void HandleEvent(object sender, NotifyEvent e, HandlingPriority prority)
 		{
             if (e.Type == EventType.Command)
             {
@@ -139,15 +139,15 @@ namespace AntPlugin
 
         #region Custom Methods
 
-        public void InitBasics()
+        private void InitBasics()
         {
             pluginImage = PluginBase.MainForm.FindImage("486");
-            String dataPath = Path.Combine(PathHelper.DataDir, PLUGIN_NAME);
+            string dataPath = Path.Combine(PathHelper.DataDir, PLUGIN_NAME);
             if (!Directory.Exists(dataPath)) Directory.CreateDirectory(dataPath);
             settingFilename = Path.Combine(dataPath, SETTINGS_FILE);
         }
 
-        public void CreateMenuItems()
+        private void CreateMenuItems()
         {
             ToolStripMenuItem menuItem = new ToolStripMenuItem("Ant Window", pluginImage, ShowAntWindow);
             ToolStripMenuItem menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("ViewMenu");
@@ -167,19 +167,19 @@ namespace AntPlugin
             pluginPanel.Show();
 	    }
 
-        public void RunTarget(String file, String target)
+        private void RunTarget(string file, string target)
         {
-            String command = Environment.SystemDirectory + "\\cmd.exe";
-            String arguments = "/c ";
+            string command = Environment.SystemDirectory + "\\cmd.exe";
+            string arguments = "/c ";
             if (settingObject.AntPath.Length == 0) arguments += "ant";
             else arguments += Path.Combine(settingObject.AntPath, "bin") + "\\ant";
             arguments += " -buildfile \"" + file + "\" \"" + target + "\"";
 			Globals.MainForm.CallCommand("RunProcessCaptured", command + ";" + arguments);
         }
 
-        public void AddBuildFiles(String[] files)
+        private void AddBuildFiles(string[] files)
         {
-            foreach (String file in files)
+            foreach (string file in files)
             {
                 if (!buildFilesList.Contains(file)) buildFilesList.Add(file);
             }
@@ -187,7 +187,7 @@ namespace AntPlugin
             pluginUI.RefreshData();
         }
 
-        public void RemoveBuildFile(String file)
+        private void RemoveBuildFile(string file)
         {
             if (buildFilesList.Contains(file)) buildFilesList.Remove(file);
             SaveBuildFiles();
@@ -197,12 +197,12 @@ namespace AntPlugin
         private void ReadBuildFiles()
         {
             buildFilesList.Clear();
-            String folder = GetBuildFilesStorageFolder();
-            String fullName = folder + "\\" + STORAGE_FILE_NAME;
+            string folder = GetBuildFilesStorageFolder();
+            string fullName = folder + "\\" + STORAGE_FILE_NAME;
             if (File.Exists(fullName))
             {
                 StreamReader file = new StreamReader(fullName);
-                String line;
+                string line;
                 while ((line = file.ReadLine()) != null)
                 {
                     if (line.Length > 0 && !buildFilesList.Contains(line)) buildFilesList.Add(line);
@@ -213,46 +213,31 @@ namespace AntPlugin
 
         private void SaveBuildFiles()
         {
-            String folder = GetBuildFilesStorageFolder();
-            String fullName = folder + "\\" + STORAGE_FILE_NAME;
+            string folder = GetBuildFilesStorageFolder();
+            string fullName = folder + "\\" + STORAGE_FILE_NAME;
             if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
             StreamWriter file = new StreamWriter(fullName);
-            foreach (String line in buildFilesList)
+            foreach (string line in buildFilesList)
             {
                 file.WriteLine(line);
             }
             file.Close();
         }
 
-        private String GetBuildFilesStorageFolder()
+        private string GetBuildFilesStorageFolder()
         {
-            String projectFolder = Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath);
+            string projectFolder = Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath);
             return Path.Combine(projectFolder, "obj");
         }
-        
-        public void LoadSettings()
+
+        private void LoadSettings()
         {
-            if (File.Exists(settingFilename))
-            {
-                try
-                {
-                    settingObject = new Settings();
-                    settingObject = (Settings) ObjectSerializer.Deserialize(settingFilename, settingObject);
-                }
-                catch
-                {
-                    settingObject = new Settings();
-                    SaveSettings();
-                }
-            }
-            else
-            {
-                settingObject = new Settings();
-                SaveSettings();
-            }
+            settingObject = new Settings();
+            if (!File.Exists(settingFilename)) SaveSettings();
+            else settingObject = (Settings)ObjectSerializer.Deserialize(settingFilename, settingObject);
         }
 
-        public void SaveSettings()
+        private void SaveSettings()
         {
             ObjectSerializer.Serialize(settingFilename, settingObject);
         }
