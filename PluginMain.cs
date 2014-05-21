@@ -22,15 +22,12 @@ namespace AntPlugin
         private const String PLUGIN_AUTH = "Canab";
 	    private const String SETTINGS_FILE = "Settings.fdb";
         private const String PLUGIN_DESC = "Ant plugin";
-
         private const String STORAGE_FILE_NAME = "antPluginData.txt";
-        
         private List<String> buildFilesList = new List<string>();
         public List<string> BuildFilesList
         {
             get { return buildFilesList; }
         }
-        
         private String settingFilename;
         private Settings settingObject;
         private DockContent pluginPanel;
@@ -132,8 +129,7 @@ namespace AntPlugin
                 string cmd = (e as DataEvent).Action;
                 if (cmd == "ProjectManager.Project")
                 {
-                    if (PluginBase.CurrentProject != null)
-                        ReadBuildFiles();
+                    if (PluginBase.CurrentProject != null) ReadBuildFiles();
                     pluginUI.RefreshData();
                 }
             }
@@ -147,18 +143,14 @@ namespace AntPlugin
         {
             pluginImage = PluginBase.MainForm.FindImage("486");
             String dataPath = Path.Combine(PathHelper.DataDir, PLUGIN_NAME);
-            if (!Directory.Exists(dataPath))
-                Directory.CreateDirectory(dataPath);
+            if (!Directory.Exists(dataPath)) Directory.CreateDirectory(dataPath);
             settingFilename = Path.Combine(dataPath, SETTINGS_FILE);
         }
 
         public void CreateMenuItems()
         {
+            ToolStripMenuItem menuItem = new ToolStripMenuItem("Ant Window", pluginImage, ShowAntWindow);
             ToolStripMenuItem menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("ViewMenu");
-            ToolStripMenuItem menuItem;
-
-            menuItem = new ToolStripMenuItem("Ant Window",
-                pluginImage, new EventHandler(ShowAntWindow));
             menu.DropDownItems.Add(menuItem);
         }
 
@@ -167,8 +159,7 @@ namespace AntPlugin
             pluginUI = new PluginUI(this);
             pluginUI.Text = "Ant";
             pluginUI.StartDragHandling();
-            pluginPanel = PluginBase.MainForm.CreateDockablePanel(
-                pluginUI, PLUGIN_GUID, pluginImage, DockState.DockRight);
+            pluginPanel = PluginBase.MainForm.CreateDockablePanel(pluginUI, PLUGIN_GUID, pluginImage, DockState.DockRight);
         }
 
         private void ShowAntWindow(object sender, EventArgs e)
@@ -179,17 +170,10 @@ namespace AntPlugin
         public void RunTarget(String file, String target)
         {
             String command = Environment.SystemDirectory + "\\cmd.exe";
-            
             String arguments = "/c ";
-            if (settingObject.AntPath.Length > 0)
-                arguments += Path.Combine(settingObject.AntPath, "bin") + "\\ant";
-            else
-                arguments += "ant";
-
+            if (settingObject.AntPath.Length == 0) arguments += "ant";
+            else arguments += Path.Combine(settingObject.AntPath, "bin") + "\\ant";
             arguments += " -buildfile \"" + file + "\" \"" + target + "\"";
-            
-			//TraceManager.Add(command + " " + arguments);
-            
 			Globals.MainForm.CallCommand("RunProcessCaptured", command + ";" + arguments);
         }
 
@@ -197,8 +181,7 @@ namespace AntPlugin
         {
             foreach (String file in files)
             {
-                if (!buildFilesList.Contains(file))
-                    buildFilesList.Add(file);
+                if (!buildFilesList.Contains(file)) buildFilesList.Add(file);
             }
             SaveBuildFiles();
             pluginUI.RefreshData();
@@ -206,8 +189,7 @@ namespace AntPlugin
 
         public void RemoveBuildFile(String file)
         {
-            if (buildFilesList.Contains(file))
-                buildFilesList.Remove(file);
+            if (buildFilesList.Contains(file)) buildFilesList.Remove(file);
             SaveBuildFiles();
             pluginUI.RefreshData();
         }
@@ -217,15 +199,13 @@ namespace AntPlugin
             buildFilesList.Clear();
             String folder = GetBuildFilesStorageFolder();
             String fullName = folder + "\\" + STORAGE_FILE_NAME;
-
             if (File.Exists(fullName))
             {
                 StreamReader file = new StreamReader(fullName);
                 String line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line.Length > 0 && !buildFilesList.Contains(line))
-                        buildFilesList.Add(line);
+                    if (line.Length > 0 && !buildFilesList.Contains(line)) buildFilesList.Add(line);
                 }
                 file.Close();
             }
@@ -235,8 +215,7 @@ namespace AntPlugin
         {
             String folder = GetBuildFilesStorageFolder();
             String fullName = folder + "\\" + STORAGE_FILE_NAME;
-            if (!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
+            if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
             StreamWriter file = new StreamWriter(fullName);
             foreach (String line in buildFilesList)
             {
@@ -247,8 +226,7 @@ namespace AntPlugin
 
         private String GetBuildFilesStorageFolder()
         {
-            String projectFolder = Path.GetDirectoryName(
-                PluginBase.CurrentProject.ProjectPath);
+            String projectFolder = Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath);
             return Path.Combine(projectFolder, "obj");
         }
         
@@ -280,7 +258,5 @@ namespace AntPlugin
         }
 
 		#endregion
-
     }
-	
 }
