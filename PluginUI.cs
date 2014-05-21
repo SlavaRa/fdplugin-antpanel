@@ -4,7 +4,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
-using FlashDevelop;
 using PluginCore;
 using ScintillaNet;
 
@@ -69,8 +68,8 @@ namespace AntPlugin
         private void MenuEditClick(object sender, EventArgs e)
         {
             AntTreeNode node = treeView.SelectedNode as AntTreeNode;
-            Globals.MainForm.OpenEditableDocument(node.File, false);
-            ScintillaControl sci = Globals.SciControl;
+            PluginBase.MainForm.OpenEditableDocument(node.File, false);
+            ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
 
             String text = sci.Text;
             Regex regexp = new Regex("<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>");

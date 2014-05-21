@@ -4,7 +4,6 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.ComponentModel;
-using FlashDevelop;
 using PluginCore.Utilities;
 using PluginCore.Managers;
 using PluginCore.Helpers;
@@ -170,7 +169,7 @@ namespace AntPlugin
             if (settingObject.AntPath.Length == 0) arguments += "ant";
             else arguments += Path.Combine(settingObject.AntPath, "bin") + "\\ant";
             arguments += " -buildfile \"" + file + "\" \"" + target + "\"";
-			Globals.MainForm.CallCommand("RunProcessCaptured", command + ";" + arguments);
+            PluginBase.MainForm.CallCommand("RunProcessCaptured", command + ";" + arguments);
         }
 
         public void AddBuildFiles(string[] files)
