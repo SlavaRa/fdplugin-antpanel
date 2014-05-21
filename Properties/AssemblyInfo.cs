@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Canab")]
 [assembly: AssemblyProduct("AntPlugin")]
-[assembly: AssemblyCopyright("FlashDevelop.org 2005-2008")]
+[assembly: AssemblyCopyright("FlashDevelop.org 2005-2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

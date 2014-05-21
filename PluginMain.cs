@@ -94,6 +94,7 @@ namespace AntPlugin
 		/// </summary>
 		public void Initialize()
 		{
+            BuildFilesList = new List<string>();
             InitBasics();
             LoadSettings();
             AddEventHandlers();
