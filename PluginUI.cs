@@ -43,6 +43,33 @@ namespace AntPlugin
             targetMenu.Items.Add("Show in Editor", null, MenuEditClick);
         }
 
+        private void treeView_NodeKeyPress(object sender, KeyPressEventArgs e)
+        {
+            switch (e.KeyChar)
+            {
+                case (Char)Keys.Enter:
+                    e.Handled = true;
+                    RunTarget();
+                    break;
+            }
+        }
+
+        private void treeView_NodeKeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Apps:
+                    e.Handled = true;
+                    TreeNode selectedNode = treeView.SelectedNode;
+                    if (selectedNode != null)
+                    {
+                        if (selectedNode.Parent == null) buildFileMenu.Show(treeView, selectedNode.Bounds.Location);
+                        else targetMenu.Show(treeView, selectedNode.Bounds.Location);
+                    }
+                    break;
+            }
+        }
+
         private void treeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Button == MouseButtons.Right)

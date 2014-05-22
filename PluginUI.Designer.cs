@@ -109,6 +109,8 @@ namespace AntPlugin
             this.treeView.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView_BeforeCollapse);
             this.treeView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView_MouseDown);
             this.treeView.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseClick);
+            this.treeView.KeyUp += treeView_NodeKeyUp;
+            this.treeView.KeyPress += treeView_NodeKeyPress;
             // 
             // imageList
             // 
@@ -131,7 +133,6 @@ namespace AntPlugin
             this.toolStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
