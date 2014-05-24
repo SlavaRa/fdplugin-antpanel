@@ -151,10 +151,10 @@ namespace AntPlugin
 
         public void RunTarget(string file, string target)
         {
-            string command = Environment.SystemDirectory + "\\cmd.exe";
+            string command = Path.Combine(Environment.SystemDirectory, "cmd.exe");
             string arguments = "/c ";
             if (string.IsNullOrEmpty(settings.AntPath)) arguments += "ant";
-            else arguments += Path.Combine(settings.AntPath, "bin") + "\\ant";
+            else arguments += Path.Combine(Path.Combine(settings.AntPath, "bin"), "ant");
             arguments += " -buildfile \"" + file + "\" \"" + target + "\"";
             PluginBase.MainForm.CallCommand("RunProcessCaptured", command + ";" + arguments);
         }
@@ -163,7 +163,7 @@ namespace AntPlugin
         {
             BuildFilesList.Clear();
             string folder = GetBuildFilesStorageFolder();
-            string fullName = folder + Path.DirectorySeparatorChar + STORAGE_FILE_NAME;
+            string fullName = Path.Combine(folder, STORAGE_FILE_NAME);
             if (!File.Exists(fullName)) return;
             StreamReader file = new StreamReader(fullName);
             string line;
@@ -209,7 +209,7 @@ namespace AntPlugin
         private void SaveBuildFiles()
         {
             string folder = GetBuildFilesStorageFolder();
-            string fullName = folder + Path.DirectorySeparatorChar + STORAGE_FILE_NAME;
+            string fullName = Path.Combine(folder, STORAGE_FILE_NAME);
             if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
             StreamWriter file = new StreamWriter(fullName);
             foreach (string line in BuildFilesList)
