@@ -24,7 +24,7 @@ namespace AntPlugin
         private const string STORAGE_FILE_NAME = "antPluginData.txt";
         public List<string> BuildFilesList { get; private set; }
         private string settingFilename;
-        private Settings settingObject;
+        private Settings settings;
         private DockContent pluginPanel;
 	    private PluginUI pluginUI;
 	    private Image pluginImage;
@@ -82,7 +82,7 @@ namespace AntPlugin
         [Browsable(false)]
         public object Settings
         {
-            get { return settingObject; }
+            get { return settings; }
         }
 		
 		#endregion
@@ -153,8 +153,8 @@ namespace AntPlugin
         {
             string command = Environment.SystemDirectory + "\\cmd.exe";
             string arguments = "/c ";
-            if (string.IsNullOrEmpty(settingObject.AntPath)) arguments += "ant";
-            else arguments += Path.Combine(settingObject.AntPath, "bin") + "\\ant";
+            if (string.IsNullOrEmpty(settings.AntPath)) arguments += "ant";
+            else arguments += Path.Combine(settings.AntPath, "bin") + "\\ant";
             arguments += " -buildfile \"" + file + "\" \"" + target + "\"";
             PluginBase.MainForm.CallCommand("RunProcessCaptured", command + ";" + arguments);
         }
@@ -225,14 +225,14 @@ namespace AntPlugin
 
         private void LoadSettings()
         {
-            settingObject = new Settings();
+            settings = new Settings();
             if (!File.Exists(settingFilename)) SaveSettings();
-            else settingObject = (Settings)ObjectSerializer.Deserialize(settingFilename, settingObject);
+            else settings = (Settings)ObjectSerializer.Deserialize(settingFilename, settings);
         }
 
         private void SaveSettings()
         {
-            ObjectSerializer.Serialize(settingFilename, settingObject);
+            ObjectSerializer.Serialize(settingFilename, settings);
         }
 
 		#endregion
