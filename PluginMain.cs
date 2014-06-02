@@ -187,7 +187,7 @@ namespace AntPlugin
 
         private void CreateMenuItems()
         {
-            ToolStripMenuItem menuItem = new ToolStripMenuItem("Ant Window", pluginImage, ShowAntWindow);
+            ToolStripMenuItem menuItem = new ToolStripMenuItem("Ant Window", pluginImage, ShowPanel);
             ToolStripMenuItem menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("ViewMenu");
             PluginBase.MainForm.RegisterShortcutItem("ViewMenu.ShowAntPanel", menuItem);
             menu.DropDownItems.Add(menuItem);
@@ -201,7 +201,7 @@ namespace AntPlugin
             pluginPanel = PluginBase.MainForm.CreateDockablePanel(pluginUI, PLUGIN_GUID, pluginImage, DockState.DockRight);
         }
 
-        private void ShowAntWindow(object sender, EventArgs e)
+        private void ShowPanel(object sender, EventArgs e)
 	    {
             pluginPanel.Show();
 	    }
