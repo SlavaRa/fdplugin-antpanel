@@ -7,7 +7,7 @@ using System.Xml;
 using PluginCore;
 using ScintillaNet;
 
-namespace AntPlugin
+namespace AntPanel
 {
     public partial class PluginUI : UserControl
     {

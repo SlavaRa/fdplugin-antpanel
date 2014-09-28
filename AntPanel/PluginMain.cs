@@ -10,7 +10,7 @@ using PluginCore.Helpers;
 using PluginCore;
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace AntPlugin
+namespace AntPanel
 {
 	public class PluginMain : IPlugin
 	{
