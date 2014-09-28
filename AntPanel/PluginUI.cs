@@ -1,11 +1,11 @@
-﻿using System;
+﻿using PluginCore;
+using ScintillaNet;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
-using PluginCore;
-using ScintillaNet;
 
 namespace AntPanel
 {
