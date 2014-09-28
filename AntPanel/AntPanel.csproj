@@ -8,8 +8,8 @@
     <ProjectGuid>{9E80A8F9-C99E-427D-AE23-C1CF3C17451B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AntPlugin</RootNamespace>
-    <AssemblyName>AntPlugin</AssemblyName>
+    <RootNamespace>AntPanel</RootNamespace>
+    <AssemblyName>AntPanel</AssemblyName>
     <StartupObject>
     </StartupObject>
     <FileUpgradeFlags>

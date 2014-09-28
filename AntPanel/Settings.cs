@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms.Design;
 
-namespace AntPlugin
+namespace AntPanel
 {
     [Serializable]
     public class Settings
