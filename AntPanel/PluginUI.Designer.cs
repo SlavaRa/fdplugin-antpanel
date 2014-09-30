@@ -39,9 +39,9 @@ namespace AntPanel
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PluginUI));
             this.toolStrip = new System.Windows.Forms.ToolStrip();
-            this.addButton = new System.Windows.Forms.ToolStripButton();
-            this.refreshButton = new System.Windows.Forms.ToolStripButton();
-            this.runButton = new System.Windows.Forms.ToolStripButton();
+            this.add = new System.Windows.Forms.ToolStripButton();
+            this.refresh = new System.Windows.Forms.ToolStripButton();
+            this.run = new System.Windows.Forms.ToolStripButton();
             this.tree = new System.Windows.Forms.TreeView();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.toolStrip.SuspendLayout();
@@ -51,9 +51,9 @@ namespace AntPanel
             // 
             this.toolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addButton,
-            this.refreshButton,
-            this.runButton});
+            this.add,
+            this.refresh,
+            this.run});
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
             this.toolStrip.Size = new System.Drawing.Size(279, 25);
@@ -62,34 +62,34 @@ namespace AntPanel
             // 
             // addButton
             // 
-            this.addButton.Image = ((System.Drawing.Image)(resources.GetObject("addButton.Image")));
-            this.addButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.addButton.Name = "addButton";
-            this.addButton.Size = new System.Drawing.Size(49, 22);
-            this.addButton.Text = "Add";
-            this.addButton.ToolTipText = "Add build file";
-            this.addButton.Click += new System.EventHandler(this.addButton_Click);
+            this.add.Image = ((System.Drawing.Image)(resources.GetObject("addButton.Image")));
+            this.add.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.add.Name = "addButton";
+            this.add.Size = new System.Drawing.Size(49, 22);
+            this.add.Text = "Add";
+            this.add.ToolTipText = "Add build file";
+            this.add.Click += new System.EventHandler(this.AddClick);
             // 
             // refreshButton
             // 
-            this.refreshButton.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.refreshButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.refreshButton.Image = ((System.Drawing.Image)(resources.GetObject("refreshButton.Image")));
-            this.refreshButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.refreshButton.Name = "refreshButton";
-            this.refreshButton.Size = new System.Drawing.Size(23, 22);
-            this.refreshButton.Text = "toolStripButton2";
-            this.refreshButton.ToolTipText = "Refresh";
-            this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
+            this.refresh.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.refresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.refresh.Image = ((System.Drawing.Image)(resources.GetObject("refreshButton.Image")));
+            this.refresh.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.refresh.Name = "refreshButton";
+            this.refresh.Size = new System.Drawing.Size(23, 22);
+            this.refresh.Text = "toolStripButton2";
+            this.refresh.ToolTipText = "Refresh";
+            this.refresh.Click += new System.EventHandler(this.RefreshClick);
             // 
             // runButton
             // 
-            this.runButton.Image = ((System.Drawing.Image)(resources.GetObject("runButton.Image")));
-            this.runButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.runButton.Name = "runButton";
-            this.runButton.Size = new System.Drawing.Size(48, 22);
-            this.runButton.Text = "Run";
-            this.runButton.Click += new System.EventHandler(this.runButton_Click);
+            this.run.Image = ((System.Drawing.Image)(resources.GetObject("runButton.Image")));
+            this.run.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.run.Name = "runButton";
+            this.run.Size = new System.Drawing.Size(48, 22);
+            this.run.Text = "Run";
+            this.run.Click += new System.EventHandler(this.RunClick);
             // 
             // treeView
             // 
@@ -104,13 +104,14 @@ namespace AntPanel
             this.tree.ShowNodeToolTips = true;
             this.tree.Size = new System.Drawing.Size(279, 285);
             this.tree.TabIndex = 1;
-            this.tree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseDoubleClick);
-            this.tree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView_BeforeExpand);
-            this.tree.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView_BeforeCollapse);
-            this.tree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView_MouseDown);
-            this.tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseClick);
-            this.tree.KeyUp += treeView_NodeKeyUp;
-            this.tree.KeyPress += treeView_NodeKeyPress;
+            this.tree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeNodeMouseDoubleClick);
+            this.tree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeBeforeExpand);
+            this.tree.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeBeforeCollapse);
+            this.tree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TreeMouseDown);
+            this.tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeNodeMouseClick);
+            this.tree.KeyDown += new KeyEventHandler(TreeKeyDown);
+            this.tree.KeyUp += TreeNodeKeyUp;
+            this.tree.KeyPress += TreeNodeKeyPress;
             // 
             // imageList
             // 
@@ -139,39 +140,39 @@ namespace AntPanel
 
         private System.Windows.Forms.ToolStrip toolStrip;
         private System.Windows.Forms.TreeView tree;
-        private System.Windows.Forms.ToolStripButton addButton;
-        private System.Windows.Forms.ToolStripButton refreshButton;
+        private System.Windows.Forms.ToolStripButton add;
+        private System.Windows.Forms.ToolStripButton refresh;
         private System.Windows.Forms.ImageList imageList;
-        private System.Windows.Forms.ToolStripButton runButton;
+        private System.Windows.Forms.ToolStripButton run;
 
-        private void treeView_MouseDown(object sender, MouseEventArgs e)
+        internal void StartDragHandling()
+        {
+            this.tree.AllowDrop = true;
+            this.tree.DragEnter += new DragEventHandler(TreeDragEnter);
+            this.tree.DragDrop += new DragEventHandler(TreeDragDrop);
+            this.tree.DragOver += new DragEventHandler(TreeDragOver);
+        }
+
+        private void TreeMouseDown(object sender, MouseEventArgs e)
         {
             int delta = (int)DateTime.Now.Subtract(lastMouseDown).TotalMilliseconds;
             preventExpand = (delta < SystemInformation.DoubleClickTime);
             lastMouseDown = DateTime.Now;
         }
 
-        private void treeView_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        private void TreeBeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             e.Cancel = preventExpand;
             preventExpand = false;
         }
 
-        private void treeView_BeforeCollapse(object sender, TreeViewCancelEventArgs e)
+        private void TreeBeforeCollapse(object sender, TreeViewCancelEventArgs e)
         {
             e.Cancel = preventExpand;
             preventExpand = false;
         }
 
-        internal void StartDragHandling()
-        {
-            this.tree.AllowDrop = true;
-            this.tree.DragEnter += new DragEventHandler(treeView_DragEnter);
-            this.tree.DragDrop += new DragEventHandler(treeView_DragDrop);
-            this.tree.DragOver += new DragEventHandler(treeView_DragOver);
-        }
-
-        void treeView_DragEnter(object sender, DragEventArgs e)
+        private void TreeDragEnter(object sender, DragEventArgs e)
         {
             String[] s = (String[])e.Data.GetData(DataFormats.FileDrop);
             List<String> xmls = new List<String>();
@@ -190,7 +191,7 @@ namespace AntPanel
             else this.dropFiles = null;
         }
 
-        void treeView_DragOver(object sender, DragEventArgs e)
+        private void TreeDragOver(object sender, DragEventArgs e)
         {
             if (this.dropFiles != null)
             {
@@ -198,7 +199,7 @@ namespace AntPanel
             }
         }
 
-        void treeView_DragDrop(object sender, DragEventArgs e)
+        private void TreeDragDrop(object sender, DragEventArgs e)
         {
             if (this.dropFiles != null)
             {
