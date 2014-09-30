@@ -31,18 +31,6 @@ namespace AntPanel
             RefreshData();
         }
 
-        private void CreateMenus()
-        {
-            buildFileMenu = new ContextMenuStrip();
-            buildFileMenu.Items.Add("Run default target", runButton.Image, MenuRunClick);
-            buildFileMenu.Items.Add("Edit file", null, MenuEditClick);
-            buildFileMenu.Items.Add(new ToolStripSeparator());
-            buildFileMenu.Items.Add("Remove", PluginBase.MainForm.FindImage("153"), MenuRemoveClick);
-            targetMenu = new ContextMenuStrip();
-            targetMenu.Items.Add("Run target", runButton.Image, MenuRunClick);
-            targetMenu.Items.Add("Show in Editor", null, MenuEditClick);
-        }
-
         public void RunTarget()
         {
             AntTreeNode node = tree.SelectedNode as AntTreeNode;
@@ -59,6 +47,18 @@ namespace AntPanel
                 tree.Nodes.Clear();
                 tree.Nodes.Add(new TreeNode("No project opened"));
             }
+        }
+
+        private void CreateMenus()
+        {
+            buildFileMenu = new ContextMenuStrip();
+            buildFileMenu.Items.Add("Run default target", runButton.Image, MenuRunClick);
+            buildFileMenu.Items.Add("Edit file", null, MenuEditClick);
+            buildFileMenu.Items.Add(new ToolStripSeparator());
+            buildFileMenu.Items.Add("Remove", PluginBase.MainForm.FindImage("153"), MenuRemoveClick);
+            targetMenu = new ContextMenuStrip();
+            targetMenu.Items.Add("Run target", runButton.Image, MenuRunClick);
+            targetMenu.Items.Add("Show in Editor", null, MenuEditClick);
         }
 
         private void FillTree()
