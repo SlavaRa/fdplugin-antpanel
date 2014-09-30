@@ -68,7 +68,7 @@ namespace AntPanel
             this.addButton.Size = new System.Drawing.Size(49, 22);
             this.addButton.Text = "Add";
             this.addButton.ToolTipText = "Add build file";
-            this.addButton.Click += new System.EventHandler(this.addButton_Click);
+            this.addButton.Click += new System.EventHandler(this.AddClick);
             // 
             // refreshButton
             // 
@@ -80,7 +80,7 @@ namespace AntPanel
             this.refreshButton.Size = new System.Drawing.Size(23, 22);
             this.refreshButton.Text = "toolStripButton2";
             this.refreshButton.ToolTipText = "Refresh";
-            this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
+            this.refreshButton.Click += new System.EventHandler(this.RefreshClick);
             // 
             // runButton
             // 
@@ -89,7 +89,7 @@ namespace AntPanel
             this.runButton.Name = "runButton";
             this.runButton.Size = new System.Drawing.Size(48, 22);
             this.runButton.Text = "Run";
-            this.runButton.Click += new System.EventHandler(this.runButton_Click);
+            this.runButton.Click += new System.EventHandler(this.RunClick);
             // 
             // treeView
             // 
@@ -104,13 +104,13 @@ namespace AntPanel
             this.tree.ShowNodeToolTips = true;
             this.tree.Size = new System.Drawing.Size(279, 285);
             this.tree.TabIndex = 1;
-            this.tree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseDoubleClick);
+            this.tree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeNodeMouseDoubleClick);
             this.tree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView_BeforeExpand);
             this.tree.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView_BeforeCollapse);
             this.tree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView_MouseDown);
-            this.tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseClick);
-            this.tree.KeyUp += treeView_NodeKeyUp;
-            this.tree.KeyPress += treeView_NodeKeyPress;
+            this.tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeNodeMouseClick);
+            this.tree.KeyUp += TreeNodeKeyUp;
+            this.tree.KeyPress += TreeNodeKeyPress;
             // 
             // imageList
             // 

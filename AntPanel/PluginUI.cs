@@ -43,86 +43,6 @@ namespace AntPanel
             targetMenu.Items.Add("Show in Editor", null, MenuEditClick);
         }
 
-        private void treeView_NodeKeyPress(object sender, KeyPressEventArgs e)
-        {
-            switch (e.KeyChar)
-            {
-                case (char)Keys.Enter:
-                    e.Handled = true;
-                    RunTarget();
-                    break;
-            }
-        }
-
-        private void treeView_NodeKeyUp(object sender, KeyEventArgs e)
-        {
-            switch (e.KeyCode)
-            {
-                case Keys.Apps:
-                    e.Handled = true;
-                    TreeNode selectedNode = tree.SelectedNode;
-                    if (selectedNode != null)
-                    {
-                        if (selectedNode.Parent == null) buildFileMenu.Show(tree, selectedNode.Bounds.Location);
-                        else targetMenu.Show(tree, selectedNode.Bounds.Location);
-                    }
-                    break;
-            }
-        }
-
-        private void treeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                AntTreeNode currentNode = tree.GetNodeAt(e.Location) as AntTreeNode;
-                tree.SelectedNode = currentNode;
-                if (currentNode.Parent == null) buildFileMenu.Show(tree, e.Location);
-                else targetMenu.Show(tree, e.Location);
-            }
-        }
-
-        private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
-            RunTarget();
-        }
-
-        private void MenuRunClick(object sender, EventArgs e)
-        {
-            RunTarget();
-        }
-        
-        private void MenuEditClick(object sender, EventArgs e)
-        {
-            AntTreeNode node = tree.SelectedNode as AntTreeNode;
-            PluginBase.MainForm.OpenEditableDocument(node.File, false);
-            ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
-            Match match = Regex.Match(sci.Text, "<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>", RegexOptions.Compiled);
-            if (match.Success)
-            {
-                sci.GotoPos(match.Index);
-                sci.SetSel(match.Index, match.Index + match.Length);
-            }
-        }
-
-        private void MenuRemoveClick(object sender, EventArgs e)
-        {
-            pluginMain.RemoveBuildFile((tree.SelectedNode as AntTreeNode).File);
-        }
-        
-        private void addButton_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "BuildFiles (*.xml)|*.XML|" + "All files (*.*)|*.*";
-            dialog.Multiselect = true;
-            if (PluginBase.CurrentProject != null) dialog.InitialDirectory = Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath);
-            if (dialog.ShowDialog() == DialogResult.OK) pluginMain.AddBuildFiles(dialog.FileNames);
-        }
-
-        private void runButton_Click(object sender, EventArgs e)
-        {
-            RunTarget();
-        }
-
         public void RunTarget()
         {
             AntTreeNode node = tree.SelectedNode as AntTreeNode;
@@ -130,11 +50,6 @@ namespace AntPanel
             pluginMain.RunTarget(node.File, node.Target);
         }
 
-        private void refreshButton_Click(object sender, EventArgs e)
-        {
-            RefreshData();
-        }
-        
         public void RefreshData()
         {
             Enabled = (PluginBase.CurrentProject != null);
@@ -217,6 +132,95 @@ namespace AntPanel
             targetNode.ToolTipText = description;
             return targetNode;
         }
+
+        #region Event Handlers
+
+        private void RefreshClick(object sender, EventArgs e)
+        {
+            RefreshData();
+        }
+
+        private void AddClick(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "BuildFiles (*.xml)|*.XML|" + "All files (*.*)|*.*";
+            dialog.Multiselect = true;
+            if (PluginBase.CurrentProject != null) dialog.InitialDirectory = Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath);
+            if (dialog.ShowDialog() == DialogResult.OK) pluginMain.AddBuildFiles(dialog.FileNames);
+        }
+
+        private void RunClick(object sender, EventArgs e)
+        {
+            RunTarget();
+        }
+
+        private void TreeNodeKeyPress(object sender, KeyPressEventArgs e)
+        {
+            switch (e.KeyChar)
+            {
+                case (char)Keys.Enter:
+                    e.Handled = true;
+                    RunTarget();
+                    break;
+            }
+        }
+
+        private void TreeNodeKeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Apps:
+                    e.Handled = true;
+                    TreeNode selectedNode = tree.SelectedNode;
+                    if (selectedNode != null)
+                    {
+                        if (selectedNode.Parent == null) buildFileMenu.Show(tree, selectedNode.Bounds.Location);
+                        else targetMenu.Show(tree, selectedNode.Bounds.Location);
+                    }
+                    break;
+            }
+        }
+
+        private void TreeNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                AntTreeNode currentNode = tree.GetNodeAt(e.Location) as AntTreeNode;
+                tree.SelectedNode = currentNode;
+                if (currentNode.Parent == null) buildFileMenu.Show(tree, e.Location);
+                else targetMenu.Show(tree, e.Location);
+            }
+        }
+
+        private void TreeNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            RunTarget();
+        }
+
+        private void MenuRunClick(object sender, EventArgs e)
+        {
+            RunTarget();
+        }
+
+        private void MenuEditClick(object sender, EventArgs e)
+        {
+            AntTreeNode node = tree.SelectedNode as AntTreeNode;
+            PluginBase.MainForm.OpenEditableDocument(node.File, false);
+            ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
+            Match match = Regex.Match(sci.Text, "<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>", RegexOptions.Compiled);
+            if (match.Success)
+            {
+                sci.GotoPos(match.Index);
+                sci.SetSel(match.Index, match.Index + match.Length);
+            }
+        }
+
+        private void MenuRemoveClick(object sender, EventArgs e)
+        {
+            pluginMain.RemoveBuildFile((tree.SelectedNode as AntTreeNode).File);
+        }
+
+        #endregion
     }
 
     internal class AntTreeNode : TreeNode
