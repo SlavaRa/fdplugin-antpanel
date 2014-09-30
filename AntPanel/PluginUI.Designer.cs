@@ -42,7 +42,7 @@ namespace AntPanel
             this.addButton = new System.Windows.Forms.ToolStripButton();
             this.refreshButton = new System.Windows.Forms.ToolStripButton();
             this.runButton = new System.Windows.Forms.ToolStripButton();
-            this.treeView = new System.Windows.Forms.TreeView();
+            this.tree = new System.Windows.Forms.TreeView();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.toolStrip.SuspendLayout();
             this.SuspendLayout();
@@ -93,24 +93,24 @@ namespace AntPanel
             // 
             // treeView
             // 
-            this.treeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.treeView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeView.HideSelection = false;
-            this.treeView.ImageIndex = 0;
-            this.treeView.ImageList = this.imageList;
-            this.treeView.Location = new System.Drawing.Point(0, 25);
-            this.treeView.Name = "treeView";
-            this.treeView.SelectedImageIndex = 0;
-            this.treeView.ShowNodeToolTips = true;
-            this.treeView.Size = new System.Drawing.Size(279, 285);
-            this.treeView.TabIndex = 1;
-            this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseDoubleClick);
-            this.treeView.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView_BeforeExpand);
-            this.treeView.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView_BeforeCollapse);
-            this.treeView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView_MouseDown);
-            this.treeView.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseClick);
-            this.treeView.KeyUp += treeView_NodeKeyUp;
-            this.treeView.KeyPress += treeView_NodeKeyPress;
+            this.tree.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tree.HideSelection = false;
+            this.tree.ImageIndex = 0;
+            this.tree.ImageList = this.imageList;
+            this.tree.Location = new System.Drawing.Point(0, 25);
+            this.tree.Name = "treeView";
+            this.tree.SelectedImageIndex = 0;
+            this.tree.ShowNodeToolTips = true;
+            this.tree.Size = new System.Drawing.Size(279, 285);
+            this.tree.TabIndex = 1;
+            this.tree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseDoubleClick);
+            this.tree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView_BeforeExpand);
+            this.tree.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView_BeforeCollapse);
+            this.tree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView_MouseDown);
+            this.tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseClick);
+            this.tree.KeyUp += treeView_NodeKeyUp;
+            this.tree.KeyPress += treeView_NodeKeyPress;
             // 
             // imageList
             // 
@@ -125,7 +125,7 @@ namespace AntPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.treeView);
+            this.Controls.Add(this.tree);
             this.Controls.Add(this.toolStrip);
             this.Name = "PluginUI";
             this.Size = new System.Drawing.Size(279, 310);
@@ -138,7 +138,7 @@ namespace AntPanel
         #endregion
 
         private System.Windows.Forms.ToolStrip toolStrip;
-        private System.Windows.Forms.TreeView treeView;
+        private System.Windows.Forms.TreeView tree;
         private System.Windows.Forms.ToolStripButton addButton;
         private System.Windows.Forms.ToolStripButton refreshButton;
         private System.Windows.Forms.ImageList imageList;
@@ -165,10 +165,10 @@ namespace AntPanel
 
         internal void StartDragHandling()
         {
-            this.treeView.AllowDrop = true;
-            this.treeView.DragEnter += new DragEventHandler(treeView_DragEnter);
-            this.treeView.DragDrop += new DragEventHandler(treeView_DragDrop);
-            this.treeView.DragOver += new DragEventHandler(treeView_DragOver);
+            this.tree.AllowDrop = true;
+            this.tree.DragEnter += new DragEventHandler(treeView_DragEnter);
+            this.tree.DragDrop += new DragEventHandler(treeView_DragDrop);
+            this.tree.DragOver += new DragEventHandler(treeView_DragOver);
         }
 
         void treeView_DragEnter(object sender, DragEventArgs e)

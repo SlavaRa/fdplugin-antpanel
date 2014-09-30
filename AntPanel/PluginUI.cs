@@ -47,7 +47,7 @@ namespace AntPanel
         {
             switch (e.KeyChar)
             {
-                case (Char)Keys.Enter:
+                case (char)Keys.Enter:
                     e.Handled = true;
                     RunTarget();
                     break;
@@ -60,11 +60,11 @@ namespace AntPanel
             {
                 case Keys.Apps:
                     e.Handled = true;
-                    TreeNode selectedNode = treeView.SelectedNode;
+                    TreeNode selectedNode = tree.SelectedNode;
                     if (selectedNode != null)
                     {
-                        if (selectedNode.Parent == null) buildFileMenu.Show(treeView, selectedNode.Bounds.Location);
-                        else targetMenu.Show(treeView, selectedNode.Bounds.Location);
+                        if (selectedNode.Parent == null) buildFileMenu.Show(tree, selectedNode.Bounds.Location);
+                        else targetMenu.Show(tree, selectedNode.Bounds.Location);
                     }
                     break;
             }
@@ -74,10 +74,10 @@ namespace AntPanel
         {
             if (e.Button == MouseButtons.Right)
             {
-                AntTreeNode currentNode = treeView.GetNodeAt(e.Location) as AntTreeNode;
-                treeView.SelectedNode = currentNode;
-                if (currentNode.Parent == null) buildFileMenu.Show(treeView, e.Location);
-                else targetMenu.Show(treeView, e.Location);
+                AntTreeNode currentNode = tree.GetNodeAt(e.Location) as AntTreeNode;
+                tree.SelectedNode = currentNode;
+                if (currentNode.Parent == null) buildFileMenu.Show(tree, e.Location);
+                else targetMenu.Show(tree, e.Location);
             }
         }
 
@@ -93,7 +93,7 @@ namespace AntPanel
         
         private void MenuEditClick(object sender, EventArgs e)
         {
-            AntTreeNode node = treeView.SelectedNode as AntTreeNode;
+            AntTreeNode node = tree.SelectedNode as AntTreeNode;
             PluginBase.MainForm.OpenEditableDocument(node.File, false);
             ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
             Match match = Regex.Match(sci.Text, "<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>", RegexOptions.Compiled);
@@ -106,7 +106,7 @@ namespace AntPanel
 
         private void MenuRemoveClick(object sender, EventArgs e)
         {
-            pluginMain.RemoveBuildFile((treeView.SelectedNode as AntTreeNode).File);
+            pluginMain.RemoveBuildFile((tree.SelectedNode as AntTreeNode).File);
         }
         
         private void addButton_Click(object sender, EventArgs e)
@@ -125,7 +125,7 @@ namespace AntPanel
 
         public void RunTarget()
         {
-            AntTreeNode node = treeView.SelectedNode as AntTreeNode;
+            AntTreeNode node = tree.SelectedNode as AntTreeNode;
             if (node == null) return;
             pluginMain.RunTarget(node.File, node.Target);
         }
@@ -141,20 +141,20 @@ namespace AntPanel
             if (Enabled) FillTree();
             else
             {
-                treeView.Nodes.Clear();
-                treeView.Nodes.Add(new TreeNode("No project opened"));
+                tree.Nodes.Clear();
+                tree.Nodes.Add(new TreeNode("No project opened"));
             }
         }
 
         private void FillTree()
         {
-            treeView.BeginUpdate();
-            treeView.Nodes.Clear();
+            tree.BeginUpdate();
+            tree.Nodes.Clear();
             foreach (string file in pluginMain.BuildFilesList)
             {
-                if (File.Exists(file)) treeView.Nodes.Add(GetBuildFileNode(file));
+                if (File.Exists(file)) tree.Nodes.Add(GetBuildFileNode(file));
             }
-            treeView.EndUpdate();
+            tree.EndUpdate();
         }
 
         private TreeNode GetBuildFileNode(string file)
@@ -209,7 +209,7 @@ namespace AntPanel
             if (targetName == defaultTarget)
             {
                 targetNode = new AntTreeNode(targetName, ICON_PUBLIC_TARGET);
-                targetNode.NodeFont = new Font(treeView.Font.Name, treeView.Font.Size, FontStyle.Bold);
+                targetNode.NodeFont = new Font(tree.Font.Name, tree.Font.Size, FontStyle.Bold);
             }
             else if (description.Length > 0) targetNode = new AntTreeNode(targetName, ICON_PUBLIC_TARGET);
             else targetNode = new AntTreeNode(targetName, ICON_INTERNAL_TARGET);
