@@ -197,6 +197,30 @@ namespace AntPanel
             RunTarget();
         }
 
+        private void TreeKeyDown(object sender, KeyEventArgs e)
+        {
+            if (tree.SelectedNode == null) return;
+            switch (e.KeyCode)
+            {
+                case Keys.Down:
+                    if (tree.SelectedNode.NextVisibleNode == null)
+                    {
+                        e.Handled = true;
+                        tree.SelectedNode = tree.Nodes[0];
+                    }
+                    break;
+                case Keys.Up:
+                    if (tree.SelectedNode.PrevVisibleNode == null)
+                    {
+                        e.Handled = true;
+                        TreeNode node = tree.SelectedNode;
+                        while (node.NextVisibleNode != null) node = node.NextVisibleNode;
+                        tree.SelectedNode = node;
+                    }
+                    break;
+            }
+        }
+
         private void MenuRunClick(object sender, EventArgs e)
         {
             RunTarget();

@@ -109,6 +109,7 @@ namespace AntPanel
             this.tree.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeBeforeCollapse);
             this.tree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TreeMouseDown);
             this.tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeNodeMouseClick);
+            this.tree.KeyDown += new KeyEventHandler(TreeKeyDown);
             this.tree.KeyUp += TreeNodeKeyUp;
             this.tree.KeyPress += TreeNodeKeyPress;
             // 
