@@ -24,9 +24,9 @@ namespace AntPanel
             this.pluginMain = pluginMain;
             InitializeComponent();
             toolStrip.Renderer = new DockPanelStripRenderer();
-            addButton.Image = PluginBase.MainForm.FindImage("33");
-            runButton.Image = PluginBase.MainForm.FindImage("487");
-            refreshButton.Image = PluginBase.MainForm.FindImage("66");
+            add.Image = PluginBase.MainForm.FindImage("33");
+            run.Image = PluginBase.MainForm.FindImage("487");
+            refresh.Image = PluginBase.MainForm.FindImage("66");
             CreateMenus();
             RefreshData();
         }
@@ -52,12 +52,12 @@ namespace AntPanel
         private void CreateMenus()
         {
             buildFileMenu = new ContextMenuStrip();
-            buildFileMenu.Items.Add("Run default target", runButton.Image, MenuRunClick);
+            buildFileMenu.Items.Add("Run default target", run.Image, MenuRunClick);
             buildFileMenu.Items.Add("Edit file", null, MenuEditClick);
             buildFileMenu.Items.Add(new ToolStripSeparator());
             buildFileMenu.Items.Add("Remove", PluginBase.MainForm.FindImage("153"), MenuRemoveClick);
             targetMenu = new ContextMenuStrip();
-            targetMenu.Items.Add("Run target", runButton.Image, MenuRunClick);
+            targetMenu.Items.Add("Run target", run.Image, MenuRunClick);
             targetMenu.Items.Add("Show in Editor", null, MenuEditClick);
         }
 
