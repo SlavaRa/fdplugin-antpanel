@@ -15,13 +15,13 @@ namespace AntPanel
 	public class PluginMain : IPlugin
 	{
         private const int PLUGIN_API = 1;
-        private const string PLUGIN_NAME = "AntPlugin";
+        private const string PLUGIN_NAME = "AntPanel";
         private const string PLUGIN_GUID = "92d9a647-6cd3-4347-9db6-95f324292399";
         private const string PLUGIN_HELP = "www.flashdevelop.org/community/";
         private const string PLUGIN_AUTH = "Canab";
 	    private const string SETTINGS_FILE = "Settings.fdb";
-        private const string PLUGIN_DESC = "Ant plugin";
-        private const string STORAGE_FILE_NAME = "antPluginData.txt";
+        private const string PLUGIN_DESC = "AntPanel Plugin For FlashDevelop";
+        private const string STORAGE_FILE_NAME = "antPanelData.txt";
         public List<string> BuildFilesList { get; private set; }
         private string settingFilename;
         private Settings settings;
