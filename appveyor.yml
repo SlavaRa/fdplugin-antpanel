@@ -1,0 +1,3 @@
+skip_tags: true
+clone_folder: 'd:/FlashDevelop/External/Plugins/AntPanel'
+configuration: Release
