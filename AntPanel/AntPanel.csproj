@@ -33,7 +33,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\FlashDevelop\Bin\Release\Plugins\</OutputPath>
+    <OutputPath>bin\release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -88,6 +88,10 @@
     <ProjectReference Include="..\..\..\..\PluginCore\PluginCore.csproj">
       <Project>{61885f70-b4dc-4b44-852d-5d6d03f2a734}</Project>
       <Name>PluginCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ProjectManager\ProjectManager.csproj">
+      <Project>{78101c01-e186-4954-b1dd-debb7905fad8}</Project>
+      <Name>ProjectManager</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

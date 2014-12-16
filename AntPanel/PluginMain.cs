@@ -2,6 +2,7 @@ using PluginCore;
 using PluginCore.Helpers;
 using PluginCore.Managers;
 using PluginCore.Utilities;
+using ProjectManager.Controls.TreeView;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,7 +19,7 @@ namespace AntPanel
         private const string PLUGIN_NAME = "AntPanel";
         private const string PLUGIN_GUID = "92d9a647-6cd3-4347-9db6-95f324292399";
         private const string PLUGIN_HELP = "www.flashdevelop.org/community/";
-        private const string PLUGIN_AUTH = "Canab";
+        private const string PLUGIN_AUTH = "Canab, Slavara";
 	    private const string SETTINGS_FILE = "Settings.fdb";
         private const string PLUGIN_DESC = "AntPanel Plugin For FlashDevelop";
         private const string STORAGE_FILE_NAME = "antPanelData.txt";
@@ -28,6 +29,7 @@ namespace AntPanel
         private DockContent pluginPanel;
 	    private PluginUI pluginUI;
 	    private Image pluginImage;
+        private TreeView projectTree;
 
 	    #region Required Properties
 
@@ -114,30 +116,42 @@ namespace AntPanel
 		/// </summary>
         public void AddEventHandlers()
         {
-            EventManager.AddEventHandler(this, EventType.Command);
+            EventManager.AddEventHandler(this, EventType.UIStarted | EventType.Command);
         }
         
         public void HandleEvent(object sender, NotifyEvent e, HandlingPriority prority)
 		{
-            if (e.Type == EventType.Command)
+            switch (e.Type)
             {
-                string cmd = (e as DataEvent).Action;
-                if (cmd == "ProjectManager.Project")
-                {
-                    if (PluginBase.CurrentProject != null) ReadBuildFiles();
-                    pluginUI.RefreshData();
-                }
+                case EventType.UIStarted:
+                    DirectoryNode.OnDirectoryNodeRefresh += OnDirectoryNodeRefresh;
+                    break;
+                case EventType.Command:
+                    DataEvent da = (DataEvent)e;
+                    switch (da.Action)
+                    {
+                        case "ProjectManager.Project":
+                            if (PluginBase.CurrentProject != null) ReadBuildFiles();
+                            pluginUI.RefreshData();
+                            break;
+                        case  "ProjectManager.TreeSelectionChanged":
+                            OnTreeSelectionChanged();
+                            break;
+                    }
+                    break;
             }
 		}
-		
-		#endregion
+
+        #endregion
 
         #region Custom Public Methods
 
         public void AddBuildFiles(string[] files)
         {
             foreach (string file in files)
+            {
                 if (!BuildFilesList.Contains(file)) BuildFilesList.Add(file);
+            }
             SaveBuildFiles();
             pluginUI.RefreshData();
         }
@@ -217,12 +231,6 @@ namespace AntPanel
             file.Close();
         }
 
-        private string GetBuildFilesStorageFolder()
-        {
-            string projectFolder = Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath);
-            return Path.Combine(projectFolder, "obj");
-        }
-
         private void LoadSettings()
         {
             settings = new Settings();
@@ -235,6 +243,38 @@ namespace AntPanel
             ObjectSerializer.Serialize(settingFilename, settings);
         }
 
+        private string GetBuildFilesStorageFolder()
+        {
+            return Path.Combine(Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath), "obj");
+        }
+
 		#endregion
+
+        #region Event Handlers
+
+        private void OnDirectoryNodeRefresh(DirectoryNode node)
+        {
+            projectTree = node.TreeView;
+        }
+
+        private void OnTreeSelectionChanged()
+        {
+            if (projectTree == null || !(projectTree.SelectedNode is FileNode)) return;
+            string path = Path.GetFullPath(((FileNode)projectTree.SelectedNode).BackingPath);
+            if (BuildFilesList.Contains(path) || Path.GetExtension(path) != ".xml") return;
+            projectTree.ContextMenuStrip.Items.Add(new ToolStripSeparator());
+            ToolStripItem item = projectTree.ContextMenuStrip.Items.Add("Add as Ant Build File...", pluginImage, OnAddAsAntBuildFile);
+        }
+
+        private void OnAddAsAntBuildFile(object sender, EventArgs e)
+        {
+            string path = Path.GetFullPath(((FileNode)projectTree.SelectedNode).BackingPath);
+            if (BuildFilesList.Contains(path)) return;
+            BuildFilesList.Add(path);
+            SaveBuildFiles();
+            pluginUI.RefreshData();
+        }
+
+        #endregion
     }
 }
