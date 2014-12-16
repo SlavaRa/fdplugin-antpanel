@@ -1,6 +1,7 @@
 ﻿using PluginCore;
 using ScintillaNet;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -49,16 +50,24 @@ namespace AntPanel
             }
         }
 
+        public void StartDragHandling()
+        {
+            tree.AllowDrop = true;
+            tree.DragEnter += OnTreeDragEnter;
+            tree.DragDrop += OnTreeDragDrop;
+            tree.DragOver += OnTreeDragOver;
+        }
+
         private void CreateMenus()
         {
             buildFileMenu = new ContextMenuStrip();
-            buildFileMenu.Items.Add("Run default target", run.Image, MenuRunClick);
-            buildFileMenu.Items.Add("Edit file", null, MenuEditClick);
+            buildFileMenu.Items.Add("Run default target", run.Image, OnMenuRunClick);
+            buildFileMenu.Items.Add("Edit file", null, OnMenuEditClick);
             buildFileMenu.Items.Add(new ToolStripSeparator());
-            buildFileMenu.Items.Add("Remove", PluginBase.MainForm.FindImage("153"), MenuRemoveClick);
+            buildFileMenu.Items.Add("Remove", PluginBase.MainForm.FindImage("153"), OnMenuRemoveClick);
             targetMenu = new ContextMenuStrip();
-            targetMenu.Items.Add("Run target", run.Image, MenuRunClick);
-            targetMenu.Items.Add("Show in Editor", null, MenuEditClick);
+            targetMenu.Items.Add("Run target", run.Image, OnMenuRunClick);
+            targetMenu.Items.Add("Show in Editor", null, OnMenuEditClick);
         }
 
         private void FillTree()
@@ -135,12 +144,12 @@ namespace AntPanel
 
         #region Event Handlers
 
-        private void RefreshClick(object sender, EventArgs e)
+        private void OnRefreshClick(object sender, EventArgs e)
         {
             RefreshData();
         }
 
-        private void AddClick(object sender, EventArgs e)
+        private void OnAddClick(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "BuildFiles (*.xml)|*.XML|" + "All files (*.*)|*.*";
@@ -149,12 +158,12 @@ namespace AntPanel
             if (dialog.ShowDialog() == DialogResult.OK) pluginMain.AddBuildFiles(dialog.FileNames);
         }
 
-        private void RunClick(object sender, EventArgs e)
+        private void OnRunClick(object sender, EventArgs e)
         {
             RunTarget();
         }
-
-        private void TreeNodeKeyPress(object sender, KeyPressEventArgs e)
+        
+        private void OnTreeNodeKeyPress(object sender, KeyPressEventArgs e)
         {
             switch (e.KeyChar)
             {
@@ -165,7 +174,7 @@ namespace AntPanel
             }
         }
 
-        private void TreeNodeKeyUp(object sender, KeyEventArgs e)
+        private void OnTreeNodeKeyUp(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
             {
@@ -181,7 +190,7 @@ namespace AntPanel
             }
         }
 
-        private void TreeNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        private void OnTreeNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
@@ -192,12 +201,12 @@ namespace AntPanel
             }
         }
 
-        private void TreeNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        private void OnTreeNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             RunTarget();
         }
 
-        private void TreeKeyDown(object sender, KeyEventArgs e)
+        private void OnTreeKeyDown(object sender, KeyEventArgs e)
         {
             if (tree.SelectedNode == null) return;
             switch (e.KeyCode)
@@ -221,12 +230,60 @@ namespace AntPanel
             }
         }
 
-        private void MenuRunClick(object sender, EventArgs e)
+        private void OnTreeMouseDown(object sender, MouseEventArgs e)
+        {
+            int delta = (int)DateTime.Now.Subtract(lastMouseDown).TotalMilliseconds;
+            preventExpand = (delta < SystemInformation.DoubleClickTime);
+            lastMouseDown = DateTime.Now;
+        }
+
+        private void OnTreeBeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            e.Cancel = preventExpand;
+            preventExpand = false;
+        }
+
+        private void OnTreeBeforeCollapse(object sender, TreeViewCancelEventArgs e)
+        {
+            e.Cancel = preventExpand;
+            preventExpand = false;
+        }
+
+        private void OnTreeDragEnter(object sender, DragEventArgs e)
+        {
+            string[] s = (string[])e.Data.GetData(DataFormats.FileDrop);
+            List<string> xmls = new List<string>();
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (s[i].EndsWith(".xml", true, null))
+                {
+                    xmls.Add(s[i]);
+                }
+            }
+            if (xmls.Count > 0)
+            {
+                e.Effect = DragDropEffects.Copy;
+                dropFiles = xmls.ToArray();
+            }
+            else dropFiles = null;
+        }
+
+        private void OnTreeDragOver(object sender, DragEventArgs e)
+        {
+            if (this.dropFiles != null) e.Effect = DragDropEffects.Copy;
+        }
+
+        private void OnTreeDragDrop(object sender, DragEventArgs e)
+        {
+            if (dropFiles != null) pluginMain.AddBuildFiles(dropFiles);
+        }
+
+        private void OnMenuRunClick(object sender, EventArgs e)
         {
             RunTarget();
         }
 
-        private void MenuEditClick(object sender, EventArgs e)
+        private void OnMenuEditClick(object sender, EventArgs e)
         {
             AntTreeNode node = tree.SelectedNode as AntTreeNode;
             PluginBase.MainForm.OpenEditableDocument(node.File, false);
@@ -239,7 +296,7 @@ namespace AntPanel
             }
         }
 
-        private void MenuRemoveClick(object sender, EventArgs e)
+        private void OnMenuRemoveClick(object sender, EventArgs e)
         {
             pluginMain.RemoveBuildFile((tree.SelectedNode as AntTreeNode).File);
         }

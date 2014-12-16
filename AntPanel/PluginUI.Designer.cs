@@ -68,7 +68,7 @@ namespace AntPanel
             this.add.Size = new System.Drawing.Size(49, 22);
             this.add.Text = "Add";
             this.add.ToolTipText = "Add build file";
-            this.add.Click += new System.EventHandler(this.AddClick);
+            this.add.Click += new System.EventHandler(this.OnAddClick);
             // 
             // refreshButton
             // 
@@ -80,7 +80,7 @@ namespace AntPanel
             this.refresh.Size = new System.Drawing.Size(23, 22);
             this.refresh.Text = "toolStripButton2";
             this.refresh.ToolTipText = "Refresh";
-            this.refresh.Click += new System.EventHandler(this.RefreshClick);
+            this.refresh.Click += new System.EventHandler(this.OnRefreshClick);
             // 
             // runButton
             // 
@@ -89,7 +89,7 @@ namespace AntPanel
             this.run.Name = "runButton";
             this.run.Size = new System.Drawing.Size(48, 22);
             this.run.Text = "Run";
-            this.run.Click += new System.EventHandler(this.RunClick);
+            this.run.Click += new System.EventHandler(this.OnRunClick);
             // 
             // treeView
             // 
@@ -104,14 +104,14 @@ namespace AntPanel
             this.tree.ShowNodeToolTips = true;
             this.tree.Size = new System.Drawing.Size(279, 285);
             this.tree.TabIndex = 1;
-            this.tree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeNodeMouseDoubleClick);
-            this.tree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeBeforeExpand);
-            this.tree.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeBeforeCollapse);
-            this.tree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TreeMouseDown);
-            this.tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeNodeMouseClick);
-            this.tree.KeyDown += new KeyEventHandler(TreeKeyDown);
-            this.tree.KeyUp += TreeNodeKeyUp;
-            this.tree.KeyPress += TreeNodeKeyPress;
+            this.tree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnTreeNodeMouseDoubleClick);
+            this.tree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.OnTreeBeforeExpand);
+            this.tree.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.OnTreeBeforeCollapse);
+            this.tree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnTreeMouseDown);
+            this.tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnTreeNodeMouseClick);
+            this.tree.KeyDown += new KeyEventHandler(OnTreeKeyDown);
+            this.tree.KeyUp += OnTreeNodeKeyUp;
+            this.tree.KeyPress += OnTreeNodeKeyPress;
             // 
             // imageList
             // 
@@ -144,68 +144,6 @@ namespace AntPanel
         private System.Windows.Forms.ToolStripButton refresh;
         private System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.ToolStripButton run;
-
-        internal void StartDragHandling()
-        {
-            this.tree.AllowDrop = true;
-            this.tree.DragEnter += new DragEventHandler(TreeDragEnter);
-            this.tree.DragDrop += new DragEventHandler(TreeDragDrop);
-            this.tree.DragOver += new DragEventHandler(TreeDragOver);
-        }
-
-        private void TreeMouseDown(object sender, MouseEventArgs e)
-        {
-            int delta = (int)DateTime.Now.Subtract(lastMouseDown).TotalMilliseconds;
-            preventExpand = (delta < SystemInformation.DoubleClickTime);
-            lastMouseDown = DateTime.Now;
-        }
-
-        private void TreeBeforeExpand(object sender, TreeViewCancelEventArgs e)
-        {
-            e.Cancel = preventExpand;
-            preventExpand = false;
-        }
-
-        private void TreeBeforeCollapse(object sender, TreeViewCancelEventArgs e)
-        {
-            e.Cancel = preventExpand;
-            preventExpand = false;
-        }
-
-        private void TreeDragEnter(object sender, DragEventArgs e)
-        {
-            String[] s = (String[])e.Data.GetData(DataFormats.FileDrop);
-            List<String> xmls = new List<String>();
-            for (Int32 i = 0; i < s.Length; i++)
-            {
-                if (s[i].EndsWith(".xml", true, null))
-                {
-                    xmls.Add(s[i]);
-                }
-            }
-            if (xmls.Count > 0)
-            {
-                e.Effect = DragDropEffects.Copy;
-                this.dropFiles = xmls.ToArray();
-            }
-            else this.dropFiles = null;
-        }
-
-        private void TreeDragOver(object sender, DragEventArgs e)
-        {
-            if (this.dropFiles != null)
-            {
-                e.Effect = DragDropEffects.Copy;
-            }
-        }
-
-        private void TreeDragDrop(object sender, DragEventArgs e)
-        {
-            if (this.dropFiles != null)
-            {
-                this.pluginMain.AddBuildFiles(this.dropFiles);
-            }
-        }
 
     }
 }
