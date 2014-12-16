@@ -263,7 +263,7 @@ namespace AntPanel
             string path = Path.GetFullPath(((FileNode)projectTree.SelectedNode).BackingPath);
             if (BuildFilesList.Contains(path) || Path.GetExtension(path) != ".xml") return;
             projectTree.ContextMenuStrip.Items.Add(new ToolStripSeparator());
-            ToolStripItem item = projectTree.ContextMenuStrip.Items.Add("Add as Ant Build File...", pluginImage, OnAddAsAntBuildFile);
+            ToolStripItem item = projectTree.ContextMenuStrip.Items.Add("Add as Ant Build File", pluginImage, OnAddAsAntBuildFile);
         }
 
         private void OnAddAsAntBuildFile(object sender, EventArgs e)
