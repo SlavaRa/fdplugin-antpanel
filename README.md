@@ -3,4 +3,4 @@ fd-ant-panel-plugin
 
 fork of https://code.google.com/p/fd-ant-plugin/
 
-Download: https://github.com/SlavaRa/fd-antpanel-plugin/blob/master/AntPanel/bin/release/AntPanel.dll
+dll: https://github.com/SlavaRa/fd-antpanel-plugin/blob/master/AntPanel/bin/release/AntPanel.dll
