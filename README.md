@@ -1,4 +1,4 @@
-fd-ant-panel-plugin
+AntPanel plugin for FlashDevelop
 ===================
 
 fork of https://code.google.com/p/fd-ant-plugin/
