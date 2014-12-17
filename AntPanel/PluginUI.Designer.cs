@@ -39,6 +39,7 @@ namespace AntPanel
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PluginUI));
             this.toolStrip = new System.Windows.Forms.ToolStrip();
+            this.remove = new System.Windows.Forms.ToolStripButton();
             this.add = new System.Windows.Forms.ToolStripButton();
             this.refresh = new System.Windows.Forms.ToolStripButton();
             this.run = new System.Windows.Forms.ToolStripButton();
@@ -52,6 +53,7 @@ namespace AntPanel
             this.toolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.add,
+            this.remove,
             this.refresh,
             this.run});
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
@@ -60,38 +62,48 @@ namespace AntPanel
             this.toolStrip.TabIndex = 0;
             this.toolStrip.Text = "toolStrip1";
             // 
-            // addButton
+            // add
             // 
-            this.add.Image = ((System.Drawing.Image)(resources.GetObject("addButton.Image")));
+            this.add.Image = ((System.Drawing.Image)(resources.GetObject("add.Image")));
             this.add.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.add.Name = "addButton";
+            this.add.Name = "add";
             this.add.Size = new System.Drawing.Size(49, 22);
             this.add.Text = "Add";
             this.add.ToolTipText = "Add build file";
             this.add.Click += new System.EventHandler(this.OnAddClick);
             // 
-            // refreshButton
+            // remove
+            // 
+            this.remove.Image = ((System.Drawing.Image)(resources.GetObject("remove.Image")));
+            this.remove.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.remove.Name = "remove";
+            this.remove.Size = new System.Drawing.Size(49, 22);
+            this.remove.Text = "Remove";
+            this.remove.ToolTipText = "Remove build file";
+            this.remove.Click += new System.EventHandler(this.OnRemoveClick);
+            // 
+            // refresh
             // 
             this.refresh.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.refresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.refresh.Image = ((System.Drawing.Image)(resources.GetObject("refreshButton.Image")));
+            this.refresh.Image = ((System.Drawing.Image)(resources.GetObject("refresh.Image")));
             this.refresh.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.refresh.Name = "refreshButton";
+            this.refresh.Name = "refresh";
             this.refresh.Size = new System.Drawing.Size(23, 22);
             this.refresh.Text = "toolStripButton2";
             this.refresh.ToolTipText = "Refresh";
             this.refresh.Click += new System.EventHandler(this.OnRefreshClick);
             // 
-            // runButton
+            // run
             // 
-            this.run.Image = ((System.Drawing.Image)(resources.GetObject("runButton.Image")));
+            this.run.Image = ((System.Drawing.Image)(resources.GetObject("run.Image")));
             this.run.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.run.Name = "runButton";
+            this.run.Name = "run";
             this.run.Size = new System.Drawing.Size(48, 22);
             this.run.Text = "Run";
             this.run.Click += new System.EventHandler(this.OnRunClick);
             // 
-            // treeView
+            // tree
             // 
             this.tree.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.tree.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -99,19 +111,17 @@ namespace AntPanel
             this.tree.ImageIndex = 0;
             this.tree.ImageList = this.imageList;
             this.tree.Location = new System.Drawing.Point(0, 25);
-            this.tree.Name = "treeView";
+            this.tree.Name = "tree";
             this.tree.SelectedImageIndex = 0;
             this.tree.ShowNodeToolTips = true;
             this.tree.Size = new System.Drawing.Size(279, 285);
             this.tree.TabIndex = 1;
-            this.tree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnTreeNodeMouseDoubleClick);
-            this.tree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.OnTreeBeforeExpand);
             this.tree.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.OnTreeBeforeCollapse);
-            this.tree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnTreeMouseDown);
+            this.tree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.OnTreeBeforeExpand);
             this.tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnTreeNodeMouseClick);
-            this.tree.KeyDown += new KeyEventHandler(OnTreeKeyDown);
-            this.tree.KeyUp += OnTreeNodeKeyUp;
-            this.tree.KeyPress += OnTreeNodeKeyPress;
+            this.tree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnTreeNodeMouseDoubleClick);
+            this.tree.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTreeKeyDown);
+            this.tree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnTreeMouseDown);
             // 
             // imageList
             // 
@@ -134,6 +144,7 @@ namespace AntPanel
             this.toolStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -141,9 +152,10 @@ namespace AntPanel
         private System.Windows.Forms.ToolStrip toolStrip;
         private System.Windows.Forms.TreeView tree;
         private System.Windows.Forms.ToolStripButton add;
+        private System.Windows.Forms.ToolStripButton remove;
         private System.Windows.Forms.ToolStripButton refresh;
         private System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.ToolStripButton run;
-
+        
     }
 }
