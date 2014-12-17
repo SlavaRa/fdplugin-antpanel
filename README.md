@@ -1,6 +1,6 @@
-fd-ant-panel-plugin
+AntPanel plugin for FlashDevelop
 ===================
 
 fork of https://code.google.com/p/fd-ant-plugin/
 
-Download: https://dl.dropboxusercontent.com/u/63456010/FlashDevelop/fix/antpanel/AntPlugin.dll
+dll: https://github.com/SlavaRa/fd-antpanel-plugin/blob/master/AntPanel/bin/release/AntPanel.dll
