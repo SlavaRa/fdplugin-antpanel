@@ -99,7 +99,7 @@ namespace AntPanel
             InitBasics();
             LoadSettings();
             AddEventHandlers();
-            CreateMenuItems();
+            CreateMenuItem();
 		    CreatePluginPanel();
         }
 
@@ -118,7 +118,10 @@ namespace AntPanel
         {
             EventManager.AddEventHandler(this, EventType.UIStarted | EventType.Command);
         }
-        
+
+        /// <summary>
+        /// Handles the incoming events
+        /// </summary>
         public void HandleEvent(object sender, NotifyEvent e, HandlingPriority prority)
 		{
             switch (e.Type)
@@ -190,6 +193,9 @@ namespace AntPanel
 
         #region Custom Private Methods
 
+        /// <summary>
+        /// Initializes important variables
+        /// </summary>
         private void InitBasics()
         {
             BuildFilesList = new List<string>();
@@ -199,14 +205,20 @@ namespace AntPanel
             settingFilename = Path.Combine(dataPath, SETTINGS_FILE);
         }
 
-        private void CreateMenuItems()
+        /// <summary>
+        /// Creates a menu item for the plugin
+        /// </summary>
+        private void CreateMenuItem()
         {
-            ToolStripMenuItem menuItem = new ToolStripMenuItem("Ant Panel", pluginImage, ShowPanel);
+            ToolStripMenuItem menuItem = new ToolStripMenuItem("Ant Panel", pluginImage, OpenPanel);
             ToolStripMenuItem menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("ViewMenu");
             PluginBase.MainForm.RegisterShortcutItem("ViewMenu.ShowAntPanel", menuItem);
             menu.DropDownItems.Add(menuItem);
         }
 
+        /// <summary>
+        /// Creates a plugin panel for the plugin
+        /// </summary>
         private void CreatePluginPanel()
         {
             pluginUI = new PluginUI(this);
@@ -214,10 +226,31 @@ namespace AntPanel
             pluginPanel = PluginBase.MainForm.CreateDockablePanel(pluginUI, PLUGIN_GUID, pluginImage, DockState.DockRight);
         }
 
-        private void ShowPanel(object sender, EventArgs e)
-	    {
+        /// <summary>
+        /// Loads the plugin settings
+        /// </summary>
+        private void LoadSettings()
+        {
+            settings = new Settings();
+            if (!File.Exists(settingFilename)) SaveSettings();
+            else settings = (Settings)ObjectSerializer.Deserialize(settingFilename, settings);
+        }
+
+        /// <summary>
+        /// Saves the plugin settings
+        /// </summary>
+        private void SaveSettings()
+        {
+            ObjectSerializer.Serialize(settingFilename, settings);
+        }
+
+        /// <summary>
+        /// Opens the plugin panel if closed
+        /// </summary>
+        private void OpenPanel(object sender, EventArgs e)
+        {
             pluginPanel.Show();
-	    }
+        }
 
         private void SaveBuildFiles()
         {
@@ -228,18 +261,6 @@ namespace AntPanel
             foreach (string line in BuildFilesList)
                 file.WriteLine(line);
             file.Close();
-        }
-
-        private void LoadSettings()
-        {
-            settings = new Settings();
-            if (!File.Exists(settingFilename)) SaveSettings();
-            else settings = (Settings)ObjectSerializer.Deserialize(settingFilename, settings);
-        }
-
-        private void SaveSettings()
-        {
-            ObjectSerializer.Serialize(settingFilename, settings);
         }
 
         private string GetBuildFilesStorageFolder()
