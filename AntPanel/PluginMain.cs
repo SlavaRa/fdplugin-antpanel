@@ -15,7 +15,6 @@ namespace AntPanel
 {
 	public class PluginMain : IPlugin
 	{
-        private const int PLUGIN_API = 1;
         private const string PLUGIN_NAME = "AntPanel";
         private const string PLUGIN_GUID = "92d9a647-6cd3-4347-9db6-95f324292399";
         private const string PLUGIN_HELP = "www.flashdevelop.org/community/";
@@ -30,62 +29,51 @@ namespace AntPanel
 	    private PluginUI pluginUI;
 	    private Image pluginImage;
         private TreeView projectTree;
+        private Dictionary<DockState, DockState> activeStateToNewState = new Dictionary<DockState, DockState>()
+        {
+            { DockState.DockBottom, DockState.DockBottomAutoHide },
+            { DockState.DockLeft, DockState.DockLeftAutoHide },
+            { DockState.DockRight, DockState.DockRightAutoHide },
+            { DockState.DockTop, DockState.DockTopAutoHide }
+        };
 
 	    #region Required Properties
 
-        public int Api
-        {
-            get { return PLUGIN_API; }
-        }
+        /// <summary>
+        /// Api level of the plugin
+        /// </summary>
+        public int Api { get { return 1; }}
         
         /// <summary>
         /// Name of the plugin
         /// </summary> 
-        public string Name
-		{
-			get { return PLUGIN_NAME; }
-		}
+        public string Name { get { return PLUGIN_NAME; }}
 
         /// <summary>
         /// GUID of the plugin
         /// </summary>
-        public string Guid
-		{
-			get { return PLUGIN_GUID; }
-		}
+        public string Guid { get { return PLUGIN_GUID; }}
 
         /// <summary>
         /// Author of the plugin
         /// </summary> 
-        public string Author
-		{
-			get { return PLUGIN_AUTH; }
-		}
+        public string Author { get { return PLUGIN_AUTH; }}
 
         /// <summary>
         /// Description of the plugin
         /// </summary> 
-        public string Description
-		{
-			get { return PLUGIN_DESC; }
-		}
+        public string Description { get { return PLUGIN_DESC; }}
 
         /// <summary>
         /// Web address for help
         /// </summary> 
-        public string Help
-		{
-			get { return PLUGIN_HELP; }
-		}
+        public string Help { get { return PLUGIN_HELP; }}
 
         /// <summary>
         /// Object that contains the settings
         /// </summary>
         [Browsable(false)]
-        public object Settings
-        {
-            get { return settings; }
-        }
+        public object Settings { get { return settings; }}
 		
 		#endregion
 		
@@ -133,11 +121,11 @@ namespace AntPanel
                     DataEvent da = (DataEvent)e;
                     switch (da.Action)
                     {
-                        case "ProjectManager.Project":
+                        case ProjectManager.ProjectManagerEvents.Project:
                             if (PluginBase.CurrentProject != null) ReadBuildFiles();
                             pluginUI.RefreshData();
                             break;
-                        case  "ProjectManager.TreeSelectionChanged":
+                        case ProjectManager.ProjectManagerEvents.TreeSelectionChanged:
                             OnTreeSelectionChanged();
                             break;
                     }
