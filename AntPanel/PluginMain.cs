@@ -29,6 +29,13 @@ namespace AntPanel
 	    private PluginUI pluginUI;
 	    private Image pluginImage;
         private TreeView projectTree;
+        private Dictionary<DockState, DockState> activeStateToNewState = new Dictionary<DockState, DockState>()
+        {
+            { DockState.DockBottom, DockState.DockBottomAutoHide },
+            { DockState.DockLeft, DockState.DockLeftAutoHide },
+            { DockState.DockRight, DockState.DockRightAutoHide },
+            { DockState.DockTop, DockState.DockTopAutoHide }
+        };
 
 	    #region Required Properties
 
