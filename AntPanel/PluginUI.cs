@@ -166,7 +166,7 @@ namespace AntPanel
         private void RemoveTarget()
         {
             AntTreeNode node = tree.SelectedNode as AntTreeNode;
-            if (node != null) pluginMain.RemoveBuildFile((node).File);
+            if (node != null) pluginMain.RemoveBuildFile(node.File);
         }
 
         #region Event Handlers
@@ -197,13 +197,11 @@ namespace AntPanel
 
         private void OnTreeNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
-            {
-                AntTreeNode currentNode = tree.GetNodeAt(e.Location) as AntTreeNode;
-                tree.SelectedNode = currentNode;
-                if (currentNode.Parent == null) buildFileMenu.Show(tree, e.Location);
-                else targetMenu.Show(tree, e.Location);
-            }
+            if (e.Button != MouseButtons.Right) return;
+            AntTreeNode currentNode = tree.GetNodeAt(e.Location) as AntTreeNode;
+            tree.SelectedNode = currentNode;
+            if (currentNode.Parent == null) buildFileMenu.Show(tree, e.Location);
+            else targetMenu.Show(tree, e.Location);
         }
 
         private void OnTreeNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -292,7 +290,7 @@ namespace AntPanel
 
         private void OnTreeDragOver(object sender, DragEventArgs e)
         {
-            if (this.dropFiles != null) e.Effect = DragDropEffects.Copy;
+            if (dropFiles != null) e.Effect = DragDropEffects.Copy;
         }
 
         private void OnTreeDragDrop(object sender, DragEventArgs e)
@@ -311,11 +309,9 @@ namespace AntPanel
             PluginBase.MainForm.OpenEditableDocument(node.File, false);
             ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
             Match match = Regex.Match(sci.Text, "<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>", RegexOptions.Compiled);
-            if (match.Success)
-            {
-                sci.GotoPos(match.Index);
-                sci.SetSel(match.Index, match.Index + match.Length);
-            }
+            if (!match.Success) return;
+            sci.GotoPos(match.Index);
+            sci.SetSel(match.Index, match.Index + match.Length);
         }
 
         private void OnMenuRemoveClick(object sender, EventArgs e)
