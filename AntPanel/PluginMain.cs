@@ -29,7 +29,7 @@ namespace AntPanel
 	    private PluginUI pluginUI;
 	    private Image pluginImage;
         private TreeView projectTree;
-        private Dictionary<DockState, DockState> activeStateToNewState = new Dictionary<DockState, DockState>()
+        private Dictionary<DockState, DockState> panelDockStateToNewState = new Dictionary<DockState, DockState>()
         {
             { DockState.DockBottom, DockState.DockBottomAutoHide },
             { DockState.DockLeft, DockState.DockLeftAutoHide },
@@ -104,7 +104,7 @@ namespace AntPanel
 		/// </summary>
         public void AddEventHandlers()
         {
-            EventManager.AddEventHandler(this, EventType.UIStarted | EventType.Command);
+            EventManager.AddEventHandler(this, EventType.UIStarted | EventType.Command | EventType.Keys);
         }
 
         /// <summary>
@@ -128,6 +128,16 @@ namespace AntPanel
                         case ProjectManager.ProjectManagerEvents.TreeSelectionChanged:
                             OnTreeSelectionChanged();
                             break;
+                    }
+                    break;
+                case EventType.Keys:
+                    KeyEvent ke = (KeyEvent)e;
+                    if (ke.Value == PluginBase.MainForm.GetShortcutItemKeys("ViewMenu.ShowAntPanel") && !pluginPanel.IsHidden && pluginPanel.IsActivated)
+                    {
+                        if (panelDockStateToNewState.ContainsKey(pluginPanel.DockState))
+                            pluginPanel.DockState = panelDockStateToNewState[pluginPanel.DockState];
+                        pluginPanel.DockHandler.GiveUpFocus();
+                        e.Handled = true;    
                     }
                     break;
             }
@@ -199,8 +209,8 @@ namespace AntPanel
         private void CreateMenuItem()
         {
             ToolStripMenuItem menuItem = new ToolStripMenuItem("Ant Panel", pluginImage, OpenPanel);
-            ToolStripMenuItem menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("ViewMenu");
             PluginBase.MainForm.RegisterShortcutItem("ViewMenu.ShowAntPanel", menuItem);
+            ToolStripMenuItem menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("ViewMenu");
             menu.DropDownItems.Add(menuItem);
         }
 
