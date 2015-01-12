@@ -25,11 +25,8 @@ namespace AntPanel
             this.pluginMain = pluginMain;
             InitializeComponent();
             toolStrip.Renderer = new DockPanelStripRenderer();
-            add.Image = PluginBase.MainForm.FindImage("33");
-            remove.Image = PluginBase.MainForm.FindImage("153");
-            run.Image = PluginBase.MainForm.FindImage("487");
-            refresh.Image = PluginBase.MainForm.FindImage("66");
-            CreateMenus();
+            InitializeButtons();
+            InitializeContextMenu();
             StartDragHandling();
             RefreshData();
         }
@@ -37,7 +34,11 @@ namespace AntPanel
         public void RefreshData()
         {
             Enabled = (PluginBase.CurrentProject != null);
-            if (Enabled) FillTree();
+            if (Enabled) 
+            {
+                FillTree();
+                UpdateButtons();
+            }
             else
             {
                 tree.Nodes.Clear();
@@ -45,7 +46,26 @@ namespace AntPanel
             }
         }
 
-        private void CreateMenus()
+        private void InitializeButtons()
+        {
+            add.Image = PluginBase.MainForm.FindImage("33");
+            remove.Image = PluginBase.MainForm.FindImage("153");
+            run.Image = PluginBase.MainForm.FindImage("487");
+            refresh.Image = PluginBase.MainForm.FindImage("66");
+        }
+
+        private void UpdateButtons()
+        {
+            bool isNotEmpty = tree.Nodes.Count > 0;
+            remove.Enabled = isNotEmpty;
+            run.Enabled = isNotEmpty;
+            refresh.Enabled = isNotEmpty;
+        }
+
+        /// <summary>
+        /// Initializes the context menu
+        /// </summary>
+        private void InitializeContextMenu()
         {
             buildFileMenu = new ContextMenuStrip();
             buildFileMenu.Items.Add("Run default target", run.Image, OnMenuRunClick);
@@ -146,7 +166,7 @@ namespace AntPanel
         private void RemoveTarget()
         {
             AntTreeNode node = tree.SelectedNode as AntTreeNode;
-            if (node != null) pluginMain.RemoveBuildFile((node).File);
+            if (node != null) pluginMain.RemoveBuildFile(node.File);
         }
 
         #region Event Handlers
@@ -177,13 +197,11 @@ namespace AntPanel
 
         private void OnTreeNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
-            {
-                AntTreeNode currentNode = tree.GetNodeAt(e.Location) as AntTreeNode;
-                tree.SelectedNode = currentNode;
-                if (currentNode.Parent == null) buildFileMenu.Show(tree, e.Location);
-                else targetMenu.Show(tree, e.Location);
-            }
+            if (e.Button != MouseButtons.Right) return;
+            AntTreeNode currentNode = tree.GetNodeAt(e.Location) as AntTreeNode;
+            tree.SelectedNode = currentNode;
+            if (currentNode.Parent == null) buildFileMenu.Show(tree, e.Location);
+            else targetMenu.Show(tree, e.Location);
         }
 
         private void OnTreeNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -272,7 +290,7 @@ namespace AntPanel
 
         private void OnTreeDragOver(object sender, DragEventArgs e)
         {
-            if (this.dropFiles != null) e.Effect = DragDropEffects.Copy;
+            if (dropFiles != null) e.Effect = DragDropEffects.Copy;
         }
 
         private void OnTreeDragDrop(object sender, DragEventArgs e)
@@ -291,11 +309,9 @@ namespace AntPanel
             PluginBase.MainForm.OpenEditableDocument(node.File, false);
             ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
             Match match = Regex.Match(sci.Text, "<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>", RegexOptions.Compiled);
-            if (match.Success)
-            {
-                sci.GotoPos(match.Index);
-                sci.SetSel(match.Index, match.Index + match.Length);
-            }
+            if (!match.Success) return;
+            sci.GotoPos(match.Index);
+            sci.SetSel(match.Index, match.Index + match.Length);
         }
 
         private void OnMenuRemoveClick(object sender, EventArgs e)
@@ -306,7 +322,7 @@ namespace AntPanel
         #endregion
     }
 
-    internal class AntTreeNode : TreeNode
+    class AntTreeNode : TreeNode
     {
         public string File;
         public string Target;
