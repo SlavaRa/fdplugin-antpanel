@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -29,7 +30,7 @@ namespace AntPanel
 	    private PluginUI pluginUI;
 	    private Image pluginImage;
         private TreeView projectTree;
-        private Dictionary<DockState, DockState> panelDockStateToNewState = new Dictionary<DockState, DockState>()
+        private readonly Dictionary<DockState, DockState> panelDockStateToNewState = new Dictionary<DockState, DockState>()
         {
             { DockState.DockBottom, DockState.DockBottomAutoHide },
             { DockState.DockLeft, DockState.DockLeftAutoHide },
@@ -149,9 +150,9 @@ namespace AntPanel
 
         public void AddBuildFiles(string[] files)
         {
-            foreach (string file in files)
+            foreach (string file in files.Where(file => !BuildFilesList.Contains(file)))
             {
-                if (!BuildFilesList.Contains(file)) BuildFilesList.Add(file);
+                BuildFilesList.Add(file);
             }
             SaveBuildFiles();
             pluginUI.RefreshData();
@@ -219,8 +220,7 @@ namespace AntPanel
         /// </summary>
         private void CreatePluginPanel()
         {
-            pluginUI = new PluginUI(this);
-            pluginUI.Text = "Ant";
+            pluginUI = new PluginUI(this) {Text = "Ant"};
             pluginPanel = PluginBase.MainForm.CreateDockablePanel(pluginUI, PLUGIN_GUID, pluginImage, DockState.DockRight);
         }
 
@@ -261,7 +261,7 @@ namespace AntPanel
             file.Close();
         }
 
-        private string GetBuildFilesStorageFolder()
+        private static string GetBuildFilesStorageFolder()
         {
             return Path.Combine(Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath), "obj");
         }
@@ -281,7 +281,7 @@ namespace AntPanel
             string path = Path.GetFullPath(((FileNode)projectTree.SelectedNode).BackingPath);
             if (BuildFilesList.Contains(path) || Path.GetExtension(path) != ".xml") return;
             projectTree.ContextMenuStrip.Items.Add(new ToolStripSeparator());
-            ToolStripItem item = projectTree.ContextMenuStrip.Items.Add("Add as Ant Build File", pluginImage, OnAddAsAntBuildFile);
+            projectTree.ContextMenuStrip.Items.Add("Add as Ant Build File", pluginImage, OnAddAsAntBuildFile);
         }
 
         private void OnAddAsAntBuildFile(object sender, EventArgs e)

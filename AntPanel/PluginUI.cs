@@ -1,9 +1,9 @@
 ﻿using PluginCore;
 using ScintillaNet;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
@@ -16,7 +16,7 @@ namespace AntPanel
         public const int ICON_DEFAULT_TARGET = 1;
         public const int ICON_INTERNAL_TARGET = 2;
         public const int ICON_PUBLIC_TARGET = 3;
-        private PluginMain pluginMain;
+        private readonly PluginMain pluginMain;
         private ContextMenuStrip buildFileMenu;
         private ContextMenuStrip targetMenu;
         
@@ -89,9 +89,9 @@ namespace AntPanel
         {
             tree.BeginUpdate();
             tree.Nodes.Clear();
-            foreach (string file in pluginMain.BuildFilesList)
+            foreach (string file in pluginMain.BuildFilesList.Where(File.Exists))
             {
-                if (File.Exists(file)) tree.Nodes.Add(GetBuildFileNode(file));
+                tree.Nodes.Add(GetBuildFileNode(file));
             }
             tree.EndUpdate();
         }
@@ -108,31 +108,31 @@ namespace AntPanel
             string description = (descrAttr != null) ? descrAttr.InnerText : "";
             if (projectName.Length == 0)
             projectName = file;
-            AntTreeNode rootNode = new AntTreeNode(projectName, ICON_FILE);
-            rootNode.File = file;
-            rootNode.Target = defaultTarget;
-            rootNode.ToolTipText = description;
+            AntTreeNode rootNode = new AntTreeNode(projectName, ICON_FILE)
+            {
+                File = file,
+                Target = defaultTarget,
+                ToolTipText = description
+            };
             XmlNodeList nodes = xml.DocumentElement.ChildNodes;
             int nodeCount = nodes.Count;
             for (int i = 0; i < nodeCount; i++)
             {
                 XmlNode child = nodes[i];
-                if (child.Name == "target")
+                if (child.Name != "target") continue;
+                // skip private targets
+                XmlAttribute targetNameAttr = child.Attributes["name"];
+                if (targetNameAttr != null)
                 {
-                    // skip private targets
-                    XmlAttribute targetNameAttr = child.Attributes["name"];
-                    if (targetNameAttr != null)
+                    string targetName = targetNameAttr.InnerText;
+                    if (!string.IsNullOrEmpty(targetName) && (targetName[0] == '-'))
                     {
-                        string targetName = targetNameAttr.InnerText;
-                        if (!string.IsNullOrEmpty(targetName) && (targetName[0] == '-'))
-                        {
-                            continue;
-                        }
+                        continue;
                     }
-                    AntTreeNode targetNode = GetBuildTargetNode(child, defaultTarget);
-                    targetNode.File = file;
-                    rootNode.Nodes.Add(targetNode);
                 }
+                AntTreeNode targetNode = GetBuildTargetNode(child, defaultTarget);
+                targetNode.File = file;
+                rootNode.Nodes.Add(targetNode);
             }
             rootNode.Expand();
             return rootNode;
@@ -147,8 +147,10 @@ namespace AntPanel
             AntTreeNode targetNode;
             if (targetName == defaultTarget)
             {
-                targetNode = new AntTreeNode(targetName, ICON_PUBLIC_TARGET);
-                targetNode.NodeFont = new Font(tree.Font.Name, tree.Font.Size, FontStyle.Bold);
+                targetNode = new AntTreeNode(targetName, ICON_PUBLIC_TARGET)
+                {
+                    NodeFont = new Font(tree.Font.Name, tree.Font.Size, FontStyle.Bold)
+                };
             }
             else if (description.Length > 0) targetNode = new AntTreeNode(targetName, ICON_PUBLIC_TARGET);
             else targetNode = new AntTreeNode(targetName, ICON_INTERNAL_TARGET);
@@ -173,9 +175,11 @@ namespace AntPanel
 
         private void OnAddClick(object sender, EventArgs e)
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "BuildFiles (*.xml)|*.XML|" + "All files (*.*)|*.*";
-            dialog.Multiselect = true;
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "BuildFiles (*.xml)|*.XML|" + "All files (*.*)|*.*",
+                Multiselect = true
+            };
             if (PluginBase.CurrentProject != null) dialog.InitialDirectory = Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath);
             if (dialog.ShowDialog() == DialogResult.OK) pluginMain.AddBuildFiles(dialog.FileNames);
         }
@@ -272,18 +276,11 @@ namespace AntPanel
         private void OnTreeDragEnter(object sender, DragEventArgs e)
         {
             string[] s = (string[])e.Data.GetData(DataFormats.FileDrop);
-            List<string> xmls = new List<string>();
-            for (int i = 0; i < s.Length; i++)
-            {
-                if (s[i].EndsWith(".xml", true, null))
-                {
-                    xmls.Add(s[i]);
-                }
-            }
-            if (xmls.Count > 0)
+            string[] xmls = s.Where(t => t.EndsWith(".xml", true, null)).ToArray();
+            if (xmls.Length > 0)
             {
                 e.Effect = DragDropEffects.Copy;
-                dropFiles = xmls.ToArray();
+                dropFiles = xmls;
             }
             else dropFiles = null;
         }
