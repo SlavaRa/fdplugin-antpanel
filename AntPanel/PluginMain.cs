@@ -1,8 +1,3 @@
-using PluginCore;
-using PluginCore.Helpers;
-using PluginCore.Managers;
-using PluginCore.Utilities;
-using ProjectManager.Controls.TreeView;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,6 +5,12 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using PluginCore;
+using PluginCore.Helpers;
+using PluginCore.Managers;
+using PluginCore.Utilities;
+using ProjectManager;
+using ProjectManager.Controls.TreeView;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace AntPanel
@@ -24,19 +25,19 @@ namespace AntPanel
         private const string PLUGIN_DESC = "AntPanel Plugin For FlashDevelop";
         private const string STORAGE_FILE_NAME = "antPanelData.txt";
         public List<string> BuildFilesList { get; private set; }
+	    private Image pluginImage;
         private string settingFilename;
         private Settings settings;
-        private DockContent pluginPanel;
 	    private PluginUI pluginUI;
-	    private Image pluginImage;
-        private TreeView projectTree;
-        private readonly Dictionary<DockState, DockState> panelDockStateToNewState = new Dictionary<DockState, DockState>()
+        private readonly Dictionary<DockState, DockState> panelDockStateToNewState = new Dictionary<DockState, DockState>
         {
             { DockState.DockBottom, DockState.DockBottomAutoHide },
             { DockState.DockLeft, DockState.DockLeftAutoHide },
             { DockState.DockRight, DockState.DockRightAutoHide },
             { DockState.DockTop, DockState.DockTopAutoHide }
         };
+        private DockContent pluginPanel;
+        private TreeView projectTree;
 
 	    #region Required Properties
 
@@ -122,11 +123,11 @@ namespace AntPanel
                     DataEvent da = (DataEvent)e;
                     switch (da.Action)
                     {
-                        case ProjectManager.ProjectManagerEvents.Project:
+                        case ProjectManagerEvents.Project:
                             if (PluginBase.CurrentProject != null) ReadBuildFiles();
                             pluginUI.RefreshData();
                             break;
-                        case ProjectManager.ProjectManagerEvents.TreeSelectionChanged:
+                        case ProjectManagerEvents.TreeSelectionChanged:
                             OnTreeSelectionChanged();
                             break;
                     }
@@ -221,10 +222,11 @@ namespace AntPanel
         private void CreatePluginPanel()
         {
             pluginUI = new PluginUI(this) {Text = "Ant"};
+            pluginUI.OnChange += OnPluginUIChange;
             pluginPanel = PluginBase.MainForm.CreateDockablePanel(pluginUI, PLUGIN_GUID, pluginImage, DockState.DockRight);
         }
 
-        /// <summary>
+	    /// <summary>
         /// Loads the plugin settings
         /// </summary>
         private void LoadSettings()
@@ -291,6 +293,13 @@ namespace AntPanel
             BuildFilesList.Add(path);
             SaveBuildFiles();
             pluginUI.RefreshData();
+        }
+
+        private void OnPluginUIChange(object sender, PluginUIArgs e)
+        {
+            BuildFilesList.Clear();
+            BuildFilesList.AddRange(e.Paths);
+            SaveBuildFiles();
         }
 
         #endregion

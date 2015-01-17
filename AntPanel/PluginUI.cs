@@ -1,12 +1,13 @@
-﻿using PluginCore;
-using ScintillaNet;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
+using PluginCore;
+using ScintillaNet;
 
 namespace AntPanel
 {
@@ -17,6 +18,8 @@ namespace AntPanel
         public const int ICON_INTERNAL_TARGET = 2;
         public const int ICON_PUBLIC_TARGET = 3;
         private readonly PluginMain pluginMain;
+        public delegate void PluginUIEventHandler(object sender, PluginUIArgs e);
+        public event PluginUIEventHandler OnChange;
         private ContextMenuStrip buildFileMenu;
         private ContextMenuStrip targetMenu;
         
@@ -275,24 +278,71 @@ namespace AntPanel
 
         private void OnTreeDragEnter(object sender, DragEventArgs e)
         {
-            string[] s = (string[])e.Data.GetData(DataFormats.FileDrop);
-            string[] xmls = s.Where(t => t.EndsWith(".xml", true, null)).ToArray();
-            if (xmls.Length > 0)
+            if (e.Data.GetDataPresent("AntPanel.AntTreeNode"))
             {
-                e.Effect = DragDropEffects.Copy;
-                dropFiles = xmls;
+                TreeNode node = (AntTreeNode)e.Data.GetData(("AntPanel.AntTreeNode"));
+                if (node.ImageIndex != ICON_FILE) return;
+                tree.SelectedNode = null;
+                e.Effect = DragDropEffects.Move;
             }
-            else dropFiles = null;
+            else
+            {
+                string[] s = (string[])e.Data.GetData(DataFormats.FileDrop);
+                string[] xmls = s.Where(t => t.EndsWith(".xml", true, null)).ToArray();
+                if (xmls.Length > 0)
+                {
+                    e.Effect = DragDropEffects.Copy;
+                    dropFiles = xmls;
+                }
+                else dropFiles = null;
+            }
         }
 
         private void OnTreeDragOver(object sender, DragEventArgs e)
         {
-            if (dropFiles != null) e.Effect = DragDropEffects.Copy;
+            if (e.Data.GetDataPresent("AntPanel.AntTreeNode"))
+            {
+                TreeNode node = (AntTreeNode)e.Data.GetData(("AntPanel.AntTreeNode"));
+                if (node.ImageIndex != ICON_FILE) return;
+                Point p = tree.PointToClient(new Point(e.X, e.Y));
+                TreeNode dropTarget = tree.GetNodeAt(p);
+                if (dropTarget != null && dropTarget.ImageIndex != ICON_FILE) dropTarget = dropTarget.Parent;
+                tree.SelectedNode = dropTarget;
+            }
+            else if (dropFiles != null) e.Effect = DragDropEffects.Copy;
         }
 
         private void OnTreeDragDrop(object sender, DragEventArgs e)
         {
-            if (dropFiles != null) pluginMain.AddBuildFiles(dropFiles);
+            if (e.Data.GetDataPresent("AntPanel.AntTreeNode"))
+            {
+                TreeNode node = (AntTreeNode)e.Data.GetData(("AntPanel.AntTreeNode"));
+                if (node.ImageIndex != ICON_FILE) return;
+                Point p = tree.PointToClient(new Point(e.X, e.Y));
+                TreeNode dropTarget = tree.GetNodeAt(p);
+                if (dropTarget == null)
+                {
+                    node.Remove();
+                    tree.Nodes.Add(node);
+                }
+                else
+                {
+                    if (dropTarget.ImageIndex != ICON_FILE) dropTarget = dropTarget.Parent;
+                    int index = dropTarget.Index;
+                    node.Remove();
+                    tree.Nodes.Insert(index, node);
+                }
+                tree.SelectedNode = node;
+                if (OnChange == null) return;
+                List<string> paths = (from AntTreeNode antTreeNode in tree.Nodes select antTreeNode.File).ToList();
+                OnChange(this, new PluginUIArgs(paths));
+            }
+            else if (dropFiles != null) pluginMain.AddBuildFiles(dropFiles);
+        }
+
+        private void OnTreeItemDrag(object sender, ItemDragEventArgs e)
+        {
+            DoDragDrop(e.Item, DragDropEffects.Move);
         }
 
         private void OnMenuRunClick(object sender, EventArgs e)
@@ -328,5 +378,15 @@ namespace AntPanel
             : base(text, imageIndex, imageIndex)
         {
         }
+    }
+
+    public class PluginUIArgs
+    {
+        public PluginUIArgs(IEnumerable<string> paths)
+        {
+            Paths = paths;
+        }
+
+        public IEnumerable<string> Paths { get; private set; }
     }
 }
