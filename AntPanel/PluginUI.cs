@@ -306,7 +306,8 @@ namespace AntPanel
                 if (node.ImageIndex != ICON_FILE) return;
                 Point p = tree.PointToClient(new Point(e.X, e.Y));
                 TreeNode dropTarget = tree.GetNodeAt(p);
-                if (dropTarget != null && dropTarget.ImageIndex != ICON_FILE) dropTarget = dropTarget.Parent;
+                if (dropTarget == null) dropTarget = tree.Nodes[tree.Nodes.Count - 1];
+                else if (dropTarget.ImageIndex != ICON_FILE) dropTarget = dropTarget.Parent;
                 tree.SelectedNode = dropTarget;
             }
             else if (dropFiles != null) e.Effect = DragDropEffects.Copy;
