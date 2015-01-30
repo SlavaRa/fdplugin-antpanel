@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Tests of AntPanel Plugin For FlashDevelop")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("AntPanel.Tests")]
+[assembly: AssemblyDescription("Tests of AntPanel Plugin For FlashDevelop")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("SlavaRa")]
 [assembly: AssemblyProduct("AntPanel.Tests")]
-[assembly: AssemblyCopyright("FlashDevelop.org 2005-2014")]
+[assembly: AssemblyCopyright("FlashDevelop.org 2014-2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

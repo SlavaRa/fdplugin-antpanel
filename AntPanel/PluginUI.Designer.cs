@@ -39,8 +39,8 @@ namespace AntPanel
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PluginUI));
             this.toolStrip = new System.Windows.Forms.ToolStrip();
-            this.remove = new System.Windows.Forms.ToolStripButton();
             this.add = new System.Windows.Forms.ToolStripButton();
+            this.remove = new System.Windows.Forms.ToolStripButton();
             this.refresh = new System.Windows.Forms.ToolStripButton();
             this.run = new System.Windows.Forms.ToolStripButton();
             this.tree = new System.Windows.Forms.TreeView();
@@ -74,10 +74,9 @@ namespace AntPanel
             // 
             // remove
             // 
-            this.remove.Image = ((System.Drawing.Image)(resources.GetObject("remove.Image")));
             this.remove.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.remove.Name = "remove";
-            this.remove.Size = new System.Drawing.Size(49, 22);
+            this.remove.Size = new System.Drawing.Size(54, 22);
             this.remove.Text = "Remove";
             this.remove.ToolTipText = "Remove build file";
             this.remove.Click += new System.EventHandler(this.OnRemoveClick);
@@ -122,6 +121,7 @@ namespace AntPanel
             this.tree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnTreeNodeMouseDoubleClick);
             this.tree.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTreeKeyDown);
             this.tree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnTreeMouseDown);
+            this.tree.ItemDrag += new ItemDragEventHandler(this.OnTreeItemDrag);
             // 
             // imageList
             // 

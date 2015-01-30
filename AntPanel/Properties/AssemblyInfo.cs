@@ -11,9 +11,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("AntPanel")]
 [assembly: AssemblyDescription("AntPanel Plugin For FlashDevelop")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Canab")]
+[assembly: AssemblyCompany("Canab, SlavaRa")]
 [assembly: AssemblyProduct("AntPanel")]
-[assembly: AssemblyCopyright("FlashDevelop.org 2005-2014")]
+[assembly: AssemblyCopyright("FlashDevelop.org 2005-2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,3 +29,4 @@ using System.Runtime.InteropServices;
 // numbers with the '*' character (the default):
 
 [assembly: AssemblyVersion("1.0.0.0")]
+[assembly: GuidAttribute("92d9a647-6cd3-4347-9db6-95f324292399")]
