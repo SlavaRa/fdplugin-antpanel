@@ -11,21 +11,41 @@ using ScintillaNet;
 
 namespace AntPanel
 {
+    /// <summary>
+    /// </summary>
     public partial class PluginUI : UserControl
     {
-        public const int ICON_FILE = 0;
-        public const int ICON_DEFAULT_TARGET = 1;
-        public const int ICON_INTERNAL_TARGET = 2;
-        public const int ICON_PUBLIC_TARGET = 3;
-        private readonly PluginMain pluginMain;
+        private const int ICON_FILE = 0;
+        private const int ICON_INTERNAL_TARGET = 2;
+        private const int ICON_PUBLIC_TARGET = 3;
+        private const Keys EDIT_KEYS = Keys.F4;
+        private const Keys DEL_KEYS = Keys.Delete;
+
+        /// <summary>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public delegate void PluginUIEventHandler(object sender, PluginUIArgs e);
+
+        /// <summary>
+        /// </summary>
         public event PluginUIEventHandler OnChange;
+
+        private readonly PluginMain pluginMain;
+        private Image removeImage;
+        private Image editImage;
+        private IEnumerable<string> dropFiles;
         private ContextMenuStrip buildFileMenu;
         private ContextMenuStrip targetMenu;
-        
+
+        /// <summary>
+        /// Initializes a new instance of the AntPanel.PluginUI
+        /// </summary>
+        /// <param name="pluginMain"></param>
         public PluginUI(PluginMain pluginMain)
         {
             this.pluginMain = pluginMain;
+            InitializeImages();
             InitializeComponent();
             toolStrip.Renderer = new DockPanelStripRenderer();
             InitializeButtons();
@@ -34,6 +54,8 @@ namespace AntPanel
             RefreshData();
         }
 
+        /// <summary>
+        /// </summary>
         public void RefreshData()
         {
             Enabled = (PluginBase.CurrentProject != null);
@@ -49,14 +71,26 @@ namespace AntPanel
             }
         }
 
+        /// <summary>
+        /// </summary>
+        private void InitializeImages()
+        {
+            removeImage = PluginBase.MainForm.FindImage("153");
+            editImage = PluginBase.MainForm.FindImage("214");
+        }
+
+        /// <summary>
+        /// </summary>
         private void InitializeButtons()
         {
             add.Image = PluginBase.MainForm.FindImage("33");
-            remove.Image = PluginBase.MainForm.FindImage("153");
+            remove.Image = removeImage;
             run.Image = PluginBase.MainForm.FindImage("487");
             refresh.Image = PluginBase.MainForm.FindImage("66");
         }
 
+        /// <summary>
+        /// </summary>
         private void UpdateButtons()
         {
             bool isNotEmpty = tree.Nodes.Count > 0;
@@ -71,15 +105,32 @@ namespace AntPanel
         private void InitializeContextMenu()
         {
             buildFileMenu = new ContextMenuStrip();
-            buildFileMenu.Items.Add("Run default target", run.Image, OnMenuRunClick);
-            buildFileMenu.Items.Add("Edit file", null, OnMenuEditClick);
+            buildFileMenu.Items.Add(new ToolStripMenuItem("Run default target", run.Image, OnMenuRunClick)
+            {
+                ShortcutKeyDisplayString = "Enter"
+            });
+            buildFileMenu.Items.Add(new ToolStripMenuItem("Edit file", editImage, OnMenuEditClick)
+            {
+                ShortcutKeys = EDIT_KEYS
+            });
             buildFileMenu.Items.Add(new ToolStripSeparator());
-            buildFileMenu.Items.Add("Remove", PluginBase.MainForm.FindImage("153"), OnMenuRemoveClick);
+            buildFileMenu.Items.Add(new ToolStripMenuItem("Remove", removeImage, OnMenuRemoveClick)
+            {
+                ShortcutKeys = DEL_KEYS
+            });
             targetMenu = new ContextMenuStrip();
-            targetMenu.Items.Add("Run target", run.Image, OnMenuRunClick);
-            targetMenu.Items.Add("Show in Editor", null, OnMenuEditClick);
+            targetMenu.Items.Add(new ToolStripMenuItem("Run target", run.Image, OnMenuRunClick)
+            {
+                ShortcutKeyDisplayString = "Enter"
+            });
+            targetMenu.Items.Add(new ToolStripMenuItem("Show in Editor", editImage, OnMenuEditClick)
+            {
+                ShortcutKeys = EDIT_KEYS
+            });
         }
 
+        /// <summary>
+        /// </summary>
         private void StartDragHandling()
         {
             tree.AllowDrop = true;
@@ -88,6 +139,8 @@ namespace AntPanel
             tree.DragOver += OnTreeDragOver;
         }
 
+        /// <summary>
+        /// </summary>
         private void FillTree()
         {
             tree.BeginUpdate();
@@ -99,6 +152,10 @@ namespace AntPanel
             tree.EndUpdate();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         private TreeNode GetBuildFileNode(string file)
         {
             XmlDocument xml = new XmlDocument();
@@ -109,8 +166,7 @@ namespace AntPanel
             string projectName = (nameAttr != null) ? nameAttr.InnerText : file;
             XmlAttribute descrAttr = xml.DocumentElement.Attributes["description"];
             string description = (descrAttr != null) ? descrAttr.InnerText : "";
-            if (projectName.Length == 0)
-            projectName = file;
+            if (string.IsNullOrEmpty(projectName)) projectName = file;
             AntTreeNode rootNode = new AntTreeNode(projectName, ICON_FILE)
             {
                 File = file,
@@ -141,6 +197,11 @@ namespace AntPanel
             return rootNode;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="defaultTarget"></param>
+        /// <returns></returns>
         private AntTreeNode GetBuildTargetNode(XmlNode node, string defaultTarget)
         {
             XmlAttribute nameAttr = node.Attributes["name"];
@@ -162,16 +223,37 @@ namespace AntPanel
             return targetNode;
         }
 
-        private void RunTarget()
+        /// <summary>
+        /// </summary>
+        private void RunSelectedTarget()
         {
             AntTreeNode node = tree.SelectedNode as AntTreeNode;
             if (node != null) pluginMain.RunTarget(node.File, node.Target);
         }
 
-        private void RemoveTarget()
+        /// <summary>
+        /// </summary>
+        private void RemoveSelectedTarget()
         {
             AntTreeNode node = tree.SelectedNode as AntTreeNode;
-            if (node != null) pluginMain.RemoveBuildFile(node.File);
+            if (node == null) return;
+            string text = string.Format("\"{0}\" will be removed from AntPanel.", node.Text);
+            if (MessageBox.Show(text, "Confirm", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                pluginMain.RemoveBuildFile(node.File);
+        }
+
+        /// <summary>
+        /// </summary>
+        private void EditSelectedNode()
+        {
+            AntTreeNode node = tree.SelectedNode as AntTreeNode;
+            if (node == null) return;
+            PluginBase.MainForm.OpenEditableDocument(node.File, false);
+            ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
+            Match match = Regex.Match(sci.Text, "<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>", RegexOptions.Compiled);
+            if (!match.Success) return;
+            sci.GotoPos(match.Index);
+            sci.SetSel(match.Index, match.Index + match.Length);
         }
 
         #region Event Handlers
@@ -189,12 +271,12 @@ namespace AntPanel
 
         private void OnRemoveClick(object sender, EventArgs e)
         {
-            RemoveTarget();
+            RemoveSelectedTarget();
         }
 
         private void OnRunClick(object sender, EventArgs e)
         {
-            RunTarget();
+            RunSelectedTarget();
         }
         
         private void OnRefreshClick(object sender, EventArgs e)
@@ -213,48 +295,31 @@ namespace AntPanel
 
         private void OnTreeNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            RunTarget();
+            RunSelectedTarget();
         }
 
         private void OnTreeKeyDown(object sender, KeyEventArgs e)
         {
-            if (tree.SelectedNode == null) return;
+            TreeNode selectedNode = tree.SelectedNode;
+            if (selectedNode == null) return;
             switch (e.KeyCode)
             {
-                case Keys.Down:
-                    if (tree.SelectedNode.NextVisibleNode == null)
-                    {
-                        e.Handled = true;
-                        tree.SelectedNode = tree.Nodes[0];
-                    }
-                    break;
-                case Keys.Up:
-                    if (tree.SelectedNode.PrevVisibleNode == null)
-                    {
-                        e.Handled = true;
-                        TreeNode node = tree.SelectedNode;
-                        while (node.NextVisibleNode != null) node = node.NextVisibleNode;
-                        tree.SelectedNode = node;
-                    }
+                case EDIT_KEYS:
+                    EditSelectedNode();
                     break;
                 case Keys.Enter:
-                    e.Handled = true;
-                    RunTarget();
+                    RunSelectedTarget();
                     break;
                 case Keys.Apps:
-                    e.Handled = true;
-                    TreeNode selectedNode = tree.SelectedNode;
                     if (selectedNode.Parent == null) buildFileMenu.Show(tree, selectedNode.Bounds.Location);
                     else targetMenu.Show(tree, selectedNode.Bounds.Location);
                     break;
-                case Keys.Delete:
-                    if (tree.SelectedNode.ImageIndex == ICON_FILE)
-                    {
-                        e.Handled = true;
-                        RemoveTarget();
-                    }
+                case DEL_KEYS:
+                    if (selectedNode.ImageIndex == ICON_FILE) RemoveSelectedTarget();
                     break;
+                default: return;
             }
+            e.Handled = true;
         }
 
         private void OnTreeMouseDown(object sender, MouseEventArgs e)
@@ -288,8 +353,8 @@ namespace AntPanel
             else
             {
                 string[] s = (string[])e.Data.GetData(DataFormats.FileDrop);
-                string[] xmls = s.Where(t => t.EndsWith(".xml", true, null)).ToArray();
-                if (xmls.Length > 0)
+                IEnumerable<string> xmls = s.Where(t => t.EndsWith(".xml", true, null));
+                if (xmls.Any())
                 {
                     e.Effect = DragDropEffects.Copy;
                     dropFiles = xmls;
@@ -348,46 +413,60 @@ namespace AntPanel
 
         private void OnMenuRunClick(object sender, EventArgs e)
         {
-            RunTarget();
+            RunSelectedTarget();
         }
 
         private void OnMenuEditClick(object sender, EventArgs e)
         {
-            AntTreeNode node = tree.SelectedNode as AntTreeNode;
-            PluginBase.MainForm.OpenEditableDocument(node.File, false);
-            ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
-            Match match = Regex.Match(sci.Text, "<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>", RegexOptions.Compiled);
-            if (!match.Success) return;
-            sci.GotoPos(match.Index);
-            sci.SetSel(match.Index, match.Index + match.Length);
+            EditSelectedNode();
         }
 
         private void OnMenuRemoveClick(object sender, EventArgs e)
         {
-            RemoveTarget();
+            RemoveSelectedTarget();
         }
 
         #endregion
     }
 
+    /// <summary>
+    /// </summary>
     class AntTreeNode : TreeNode
     {
+        /// <summary>
+        /// </summary>
         public string File;
+
+        /// <summary>
+        /// </summary>
         public string Target;
 
+        /// <summary>
+        /// Initializes a new instance of the AntPanel.AntTreeNode
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="imageIndex"></param>
         public AntTreeNode(string text, int imageIndex)
             : base(text, imageIndex, imageIndex)
         {
         }
     }
 
+    /// <summary>
+    /// </summary>
     public class PluginUIArgs
     {
+        /// <summary>
+        /// Initializes a new instance of the AntPanel.PluginUIArgs
+        /// </summary>
+        /// <param name="paths"></param>
         public PluginUIArgs(IEnumerable<string> paths)
         {
             Paths = paths;
         }
 
+        /// <summary>
+        /// </summary>
         public IEnumerable<string> Paths { get; private set; }
     }
 }

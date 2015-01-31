@@ -11,7 +11,6 @@ namespace AntPanel
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        private String[] dropFiles = null;
         private bool preventExpand = false;
         private DateTime lastMouseDown = DateTime.Now;
 
