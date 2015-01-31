@@ -9,7 +9,7 @@ namespace AntPanel
     public class Settings
     {
         [DisplayName("Path to Ant")]
-        [Description("Path to Ant installation dir")]
+        [Description("Path to Ant installation directory")]
         [DefaultValue("")]
         [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         public string AntPath { get; set; }
