@@ -236,7 +236,10 @@ namespace AntPanel
         private void RemoveSelectedTarget()
         {
             AntTreeNode node = tree.SelectedNode as AntTreeNode;
-            if (node != null) pluginMain.RemoveBuildFile(node.File);
+            if (node == null) return;
+            string text = string.Format("\"{0}\" will be removed from AntPanel.", node.Text);
+            if (MessageBox.Show(text, "Confirm", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                pluginMain.RemoveBuildFile(node.File);
         }
 
         /// <summary>
