@@ -15,7 +15,9 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace AntPanel
 {
-	public class PluginMain : IPlugin
+    /// <summary>
+    /// </summary>
+    public class PluginMain : IPlugin
 	{
         private const string PLUGIN_NAME = "AntPanel";
         private const string PLUGIN_GUID = "92d9a647-6cd3-4347-9db6-95f324292399";
@@ -24,7 +26,11 @@ namespace AntPanel
 	    private const string SETTINGS_FILE = "Settings.fdb";
         private const string PLUGIN_DESC = "AntPanel Plugin For FlashDevelop";
         private const string STORAGE_FILE_NAME = "antPanelData.txt";
+
+        /// <summary>
+        /// </summary>
         public List<string> BuildFilesList { get; private set; }
+
 	    private Image pluginImage;
         private string settingFilename;
         private Settings settings;
@@ -136,8 +142,9 @@ namespace AntPanel
                     KeyEvent ke = (KeyEvent)e;
                     if (ke.Value == PluginBase.MainForm.GetShortcutItemKeys("ViewMenu.ShowAntPanel") && !pluginPanel.IsHidden && pluginPanel.IsActivated)
                     {
-                        if (panelDockStateToNewState.ContainsKey(pluginPanel.DockState))
-                            pluginPanel.DockState = panelDockStateToNewState[pluginPanel.DockState];
+                        DockState dockState;
+                        if (panelDockStateToNewState.TryGetValue(pluginPanel.DockState, out dockState))
+                            pluginPanel.DockState = dockState;
                         pluginPanel.DockHandler.GiveUpFocus();
                         e.Handled = true;    
                     }
@@ -149,7 +156,10 @@ namespace AntPanel
 
         #region Custom Public Methods
 
-        public void AddBuildFiles(string[] files)
+	    /// <summary>
+	    /// </summary>
+	    /// <param name="files"></param>
+	    public void AddBuildFiles(IEnumerable<string> files)
         {
             foreach (string file in files.Where(file => !BuildFilesList.Contains(file)))
             {
@@ -159,14 +169,21 @@ namespace AntPanel
             pluginUI.RefreshData();
         }
 
-        public void RemoveBuildFile(string file)
+	    /// <summary>
+	    /// </summary>
+	    /// <param name="file"></param>
+	    public void RemoveBuildFile(string file)
         {
             if (BuildFilesList.Contains(file)) BuildFilesList.Remove(file);
             SaveBuildFiles();
             pluginUI.RefreshData();
         }
 
-        public void RunTarget(string file, string target)
+	    /// <summary>
+	    /// </summary>
+	    /// <param name="file"></param>
+	    /// <param name="target"></param>
+	    public void RunTarget(string file, string target)
         {
             string command = Path.Combine(Environment.SystemDirectory, "cmd.exe");
             string arguments = "/c ";
@@ -176,6 +193,9 @@ namespace AntPanel
             PluginBase.MainForm.CallCommand("RunProcessCaptured", command + ";" + arguments);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <exception cref="OutOfMemoryException">There is insufficient memory to allocate a buffer for the returned string. </exception>
         public void ReadBuildFiles()
         {
             BuildFilesList.Clear();
@@ -252,6 +272,8 @@ namespace AntPanel
             pluginPanel.Show();
         }
 
+        /// <summary>
+        /// </summary>
         private void SaveBuildFiles()
         {
             string folder = GetBuildFilesStorageFolder();
@@ -263,6 +285,9 @@ namespace AntPanel
             file.Close();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
         private static string GetBuildFilesStorageFolder()
         {
             return Path.Combine(Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath), "obj");
