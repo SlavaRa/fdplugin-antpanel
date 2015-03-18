@@ -15,11 +15,11 @@ namespace AntPanel
     /// </summary>
     public partial class PluginUI : UserControl
     {
-        private const int ICON_FILE = 0;
-        private const int ICON_INTERNAL_TARGET = 2;
-        private const int ICON_PUBLIC_TARGET = 3;
-        private const Keys EDIT_KEYS = Keys.F4;
-        private const Keys DEL_KEYS = Keys.Delete;
+        const int ICON_FILE = 0;
+        const int ICON_INTERNAL_TARGET = 2;
+        const int ICON_PUBLIC_TARGET = 3;
+        const Keys EDIT_KEYS = Keys.F4;
+        const Keys DEL_KEYS = Keys.Delete;
 
         /// <summary>
         /// </summary>
@@ -31,12 +31,12 @@ namespace AntPanel
         /// </summary>
         public event PluginUIEventHandler OnChange;
 
-        private readonly PluginMain pluginMain;
-        private Image removeImage;
-        private Image editImage;
-        private IEnumerable<string> dropFiles;
-        private ContextMenuStrip buildFileMenu;
-        private ContextMenuStrip targetMenu;
+        readonly PluginMain pluginMain;
+        Image removeImage;
+        Image editImage;
+        IEnumerable<string> dropFiles;
+        ContextMenuStrip buildFileMenu;
+        ContextMenuStrip targetMenu;
 
         /// <summary>
         /// Initializes a new instance of the AntPanel.PluginUI
@@ -73,7 +73,7 @@ namespace AntPanel
 
         /// <summary>
         /// </summary>
-        private void InitializeImages()
+        void InitializeImages()
         {
             removeImage = PluginBase.MainForm.FindImage("153");
             editImage = PluginBase.MainForm.FindImage("214");
@@ -81,7 +81,7 @@ namespace AntPanel
 
         /// <summary>
         /// </summary>
-        private void InitializeButtons()
+        void InitializeButtons()
         {
             add.Image = PluginBase.MainForm.FindImage("33");
             remove.Image = removeImage;
@@ -91,7 +91,7 @@ namespace AntPanel
 
         /// <summary>
         /// </summary>
-        private void UpdateButtons()
+        void UpdateButtons()
         {
             bool isNotEmpty = tree.Nodes.Count > 0;
             remove.Enabled = isNotEmpty;
@@ -102,7 +102,7 @@ namespace AntPanel
         /// <summary>
         /// Initializes the context menu
         /// </summary>
-        private void InitializeContextMenu()
+        void InitializeContextMenu()
         {
             buildFileMenu = new ContextMenuStrip();
             buildFileMenu.Items.Add(new ToolStripMenuItem("Run default target", run.Image, OnMenuRunClick)
@@ -131,7 +131,7 @@ namespace AntPanel
 
         /// <summary>
         /// </summary>
-        private void StartDragHandling()
+        void StartDragHandling()
         {
             tree.AllowDrop = true;
             tree.DragEnter += OnTreeDragEnter;
@@ -141,7 +141,7 @@ namespace AntPanel
 
         /// <summary>
         /// </summary>
-        private void FillTree()
+        void FillTree()
         {
             tree.BeginUpdate();
             tree.Nodes.Clear();
@@ -156,7 +156,7 @@ namespace AntPanel
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        private TreeNode GetBuildFileNode(string file)
+        TreeNode GetBuildFileNode(string file)
         {
             XmlDocument xml = new XmlDocument();
             xml.Load(file);
@@ -202,7 +202,7 @@ namespace AntPanel
         /// <param name="node"></param>
         /// <param name="defaultTarget"></param>
         /// <returns></returns>
-        private AntTreeNode GetBuildTargetNode(XmlNode node, string defaultTarget)
+        AntTreeNode GetBuildTargetNode(XmlNode node, string defaultTarget)
         {
             XmlAttribute nameAttr = node.Attributes["name"];
             string targetName = (nameAttr != null) ? nameAttr.InnerText : "";
@@ -225,7 +225,7 @@ namespace AntPanel
 
         /// <summary>
         /// </summary>
-        private void RunSelectedTarget()
+        void RunSelectedTarget()
         {
             AntTreeNode node = tree.SelectedNode as AntTreeNode;
             if (node != null) pluginMain.RunTarget(node.File, node.Target);
@@ -233,7 +233,7 @@ namespace AntPanel
 
         /// <summary>
         /// </summary>
-        private void RemoveSelectedTarget()
+        void RemoveSelectedTarget()
         {
             AntTreeNode node = tree.SelectedNode as AntTreeNode;
             if (node == null) return;
@@ -244,7 +244,7 @@ namespace AntPanel
 
         /// <summary>
         /// </summary>
-        private void EditSelectedNode()
+        void EditSelectedNode()
         {
             AntTreeNode node = tree.SelectedNode as AntTreeNode;
             if (node == null) return;
@@ -258,7 +258,7 @@ namespace AntPanel
 
         #region Event Handlers
 
-        private void OnAddClick(object sender, EventArgs e)
+        void OnAddClick(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
@@ -269,22 +269,22 @@ namespace AntPanel
             if (dialog.ShowDialog() == DialogResult.OK) pluginMain.AddBuildFiles(dialog.FileNames);
         }
 
-        private void OnRemoveClick(object sender, EventArgs e)
+        void OnRemoveClick(object sender, EventArgs e)
         {
             RemoveSelectedTarget();
         }
 
-        private void OnRunClick(object sender, EventArgs e)
+        void OnRunClick(object sender, EventArgs e)
         {
             RunSelectedTarget();
         }
         
-        private void OnRefreshClick(object sender, EventArgs e)
+        void OnRefreshClick(object sender, EventArgs e)
         {
             RefreshData();
         }
 
-        private void OnTreeNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        void OnTreeNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Button != MouseButtons.Right) return;
             AntTreeNode currentNode = tree.GetNodeAt(e.Location) as AntTreeNode;
@@ -293,12 +293,12 @@ namespace AntPanel
             else targetMenu.Show(tree, e.Location);
         }
 
-        private void OnTreeNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        void OnTreeNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             RunSelectedTarget();
         }
 
-        private void OnTreeKeyDown(object sender, KeyEventArgs e)
+        void OnTreeKeyDown(object sender, KeyEventArgs e)
         {
             TreeNode selectedNode = tree.SelectedNode;
             if (selectedNode == null) return;
@@ -322,26 +322,26 @@ namespace AntPanel
             e.Handled = true;
         }
 
-        private void OnTreeMouseDown(object sender, MouseEventArgs e)
+        void OnTreeMouseDown(object sender, MouseEventArgs e)
         {
             int delta = (int)DateTime.Now.Subtract(lastMouseDown).TotalMilliseconds;
             preventExpand = (delta < SystemInformation.DoubleClickTime);
             lastMouseDown = DateTime.Now;
         }
 
-        private void OnTreeBeforeExpand(object sender, TreeViewCancelEventArgs e)
+        void OnTreeBeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             e.Cancel = preventExpand;
             preventExpand = false;
         }
 
-        private void OnTreeBeforeCollapse(object sender, TreeViewCancelEventArgs e)
+        void OnTreeBeforeCollapse(object sender, TreeViewCancelEventArgs e)
         {
             e.Cancel = preventExpand;
             preventExpand = false;
         }
 
-        private void OnTreeDragEnter(object sender, DragEventArgs e)
+        void OnTreeDragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent("AntPanel.AntTreeNode"))
             {
@@ -363,7 +363,7 @@ namespace AntPanel
             }
         }
 
-        private void OnTreeDragOver(object sender, DragEventArgs e)
+        void OnTreeDragOver(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent("AntPanel.AntTreeNode"))
             {
@@ -378,7 +378,7 @@ namespace AntPanel
             else if (dropFiles != null) e.Effect = DragDropEffects.Copy;
         }
 
-        private void OnTreeDragDrop(object sender, DragEventArgs e)
+        void OnTreeDragDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent("AntPanel.AntTreeNode"))
             {
@@ -406,22 +406,22 @@ namespace AntPanel
             else if (dropFiles != null) pluginMain.AddBuildFiles(dropFiles);
         }
 
-        private void OnTreeItemDrag(object sender, ItemDragEventArgs e)
+        void OnTreeItemDrag(object sender, ItemDragEventArgs e)
         {
             DoDragDrop(e.Item, DragDropEffects.Move);
         }
 
-        private void OnMenuRunClick(object sender, EventArgs e)
+        void OnMenuRunClick(object sender, EventArgs e)
         {
             RunSelectedTarget();
         }
 
-        private void OnMenuEditClick(object sender, EventArgs e)
+        void OnMenuEditClick(object sender, EventArgs e)
         {
             EditSelectedNode();
         }
 
-        private void OnMenuRemoveClick(object sender, EventArgs e)
+        void OnMenuRemoveClick(object sender, EventArgs e)
         {
             RemoveSelectedTarget();
         }
