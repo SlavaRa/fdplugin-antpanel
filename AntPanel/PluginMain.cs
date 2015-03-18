@@ -19,31 +19,31 @@ namespace AntPanel
     /// </summary>
     public class PluginMain : IPlugin
 	{
-        private const string PLUGIN_NAME = "AntPanel";
-        private const string PLUGIN_GUID = "92d9a647-6cd3-4347-9db6-95f324292399";
-        private const string PLUGIN_HELP = "http://www.flashdevelop.org/community/";
-        private const string PLUGIN_AUTH = "Canab, SlavaRa";
-	    private const string SETTINGS_FILE = "Settings.fdb";
-        private const string PLUGIN_DESC = "AntPanel Plugin For FlashDevelop";
-        private const string STORAGE_FILE_NAME = "antPanelData.txt";
+        const string PLUGIN_NAME = "AntPanel";
+        const string PLUGIN_GUID = "92d9a647-6cd3-4347-9db6-95f324292399";
+        const string PLUGIN_HELP = "http://www.flashdevelop.org/community/";
+        const string PLUGIN_AUTH = "Canab, SlavaRa";
+	    const string SETTINGS_FILE = "Settings.fdb";
+        const string PLUGIN_DESC = "AntPanel Plugin For FlashDevelop";
+        const string STORAGE_FILE_NAME = "antPanelData.txt";
 
         /// <summary>
         /// </summary>
         public List<string> BuildFilesList { get; private set; }
 
-	    private Image pluginImage;
-        private string settingFilename;
-        private Settings settings;
-	    private PluginUI pluginUI;
-        private readonly Dictionary<DockState, DockState> panelDockStateToNewState = new Dictionary<DockState, DockState>
+	    Image pluginImage;
+        string settingFilename;
+        Settings settings;
+	    PluginUI pluginUI;
+        readonly Dictionary<DockState, DockState> panelDockStateToNewState = new Dictionary<DockState, DockState>
         {
             { DockState.DockBottom, DockState.DockBottomAutoHide },
             { DockState.DockLeft, DockState.DockLeftAutoHide },
             { DockState.DockRight, DockState.DockRightAutoHide },
             { DockState.DockTop, DockState.DockTopAutoHide }
         };
-        private DockContent pluginPanel;
-        private TreeView projectTree;
+        DockContent pluginPanel;
+        TreeView projectTree;
 
 	    #region Required Properties
 
@@ -118,7 +118,7 @@ namespace AntPanel
         /// <summary>
         /// Handles the incoming events
         /// </summary>
-        public void HandleEvent(object sender, NotifyEvent e, HandlingPriority prority)
+        public void HandleEvent(object sender, NotifyEvent e, HandlingPriority priority)
 		{
             switch (e.Type)
             {
@@ -216,7 +216,7 @@ namespace AntPanel
         /// <summary>
         /// Initializes important variables
         /// </summary>
-        private void InitBasics()
+        void InitBasics()
         {
             BuildFilesList = new List<string>();
             pluginImage = PluginBase.MainForm.FindImage("486");
@@ -228,7 +228,7 @@ namespace AntPanel
         /// <summary>
         /// Creates a menu item for the plugin
         /// </summary>
-        private void CreateMenuItem()
+        void CreateMenuItem()
         {
             ToolStripMenuItem menuItem = new ToolStripMenuItem("Ant Panel", pluginImage, OpenPanel);
             PluginBase.MainForm.RegisterShortcutItem("ViewMenu.ShowAntPanel", menuItem);
@@ -239,7 +239,7 @@ namespace AntPanel
         /// <summary>
         /// Creates a plugin panel for the plugin
         /// </summary>
-        private void CreatePluginPanel()
+        void CreatePluginPanel()
         {
             pluginUI = new PluginUI(this) {Text = "Ant"};
             pluginUI.OnChange += OnPluginUIChange;
@@ -249,7 +249,7 @@ namespace AntPanel
 	    /// <summary>
         /// Loads the plugin settings
         /// </summary>
-        private void LoadSettings()
+        void LoadSettings()
         {
             settings = new Settings();
             if (!File.Exists(settingFilename)) SaveSettings();
@@ -259,7 +259,7 @@ namespace AntPanel
         /// <summary>
         /// Saves the plugin settings
         /// </summary>
-        private void SaveSettings()
+        void SaveSettings()
         {
             ObjectSerializer.Serialize(settingFilename, settings);
         }
@@ -267,14 +267,14 @@ namespace AntPanel
         /// <summary>
         /// Opens the plugin panel if closed
         /// </summary>
-        private void OpenPanel(object sender, EventArgs e)
+        void OpenPanel(object sender, EventArgs e)
         {
             pluginPanel.Show();
         }
 
         /// <summary>
         /// </summary>
-        private void SaveBuildFiles()
+        void SaveBuildFiles()
         {
             string folder = GetBuildFilesStorageFolder();
             string fullName = Path.Combine(folder, STORAGE_FILE_NAME);
@@ -288,7 +288,7 @@ namespace AntPanel
         /// <summary>
         /// </summary>
         /// <returns></returns>
-        private static string GetBuildFilesStorageFolder()
+        static string GetBuildFilesStorageFolder()
         {
             return Path.Combine(Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath), "obj");
         }
@@ -297,12 +297,12 @@ namespace AntPanel
 
         #region Event Handlers
 
-        private void OnDirectoryNodeRefresh(DirectoryNode node)
+        void OnDirectoryNodeRefresh(DirectoryNode node)
         {
             projectTree = node.TreeView;
         }
 
-        private void OnTreeSelectionChanged()
+        void OnTreeSelectionChanged()
         {
             if (projectTree == null || !(projectTree.SelectedNode is FileNode)) return;
             string path = Path.GetFullPath(((FileNode)projectTree.SelectedNode).BackingPath);
@@ -311,7 +311,7 @@ namespace AntPanel
             projectTree.ContextMenuStrip.Items.Add("Add as Ant Build File", pluginImage, OnAddAsAntBuildFile);
         }
 
-        private void OnAddAsAntBuildFile(object sender, EventArgs e)
+        void OnAddAsAntBuildFile(object sender, EventArgs e)
         {
             string path = Path.GetFullPath(((FileNode)projectTree.SelectedNode).BackingPath);
             if (BuildFilesList.Contains(path)) return;
@@ -320,7 +320,7 @@ namespace AntPanel
             pluginUI.RefreshData();
         }
 
-        private void OnPluginUIChange(object sender, PluginUIArgs e)
+        void OnPluginUIChange(object sender, PluginUIArgs e)
         {
             BuildFilesList.Clear();
             BuildFilesList.AddRange(e.Paths);
