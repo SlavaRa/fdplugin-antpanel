@@ -173,14 +173,11 @@ namespace AntPanel
                 Target = defaultTarget,
                 ToolTipText = description
             };
-            XmlNodeList nodes = xml.DocumentElement.ChildNodes;
-            int nodeCount = nodes.Count;
-            for (int i = 0; i < nodeCount; i++)
+            foreach (XmlNode node in xml.DocumentElement.ChildNodes)
             {
-                XmlNode child = nodes[i];
-                if (child.Name != "target") continue;
+                if (node.Name != "target") continue;
                 // skip private targets
-                XmlAttribute targetNameAttr = child.Attributes["name"];
+                XmlAttribute targetNameAttr = node.Attributes["name"];
                 if (targetNameAttr != null)
                 {
                     string targetName = targetNameAttr.InnerText;
@@ -189,7 +186,7 @@ namespace AntPanel
                         continue;
                     }
                 }
-                AntTreeNode targetNode = GetBuildTargetNode(child, defaultTarget);
+                AntTreeNode targetNode = GetBuildTargetNode(node, defaultTarget);
                 targetNode.File = file;
                 rootNode.Nodes.Add(targetNode);
             }
@@ -208,19 +205,19 @@ namespace AntPanel
             string targetName = (nameAttr != null) ? nameAttr.InnerText : "";
             XmlAttribute descrAttr = node.Attributes["description"];
             string description = (descrAttr != null) ? descrAttr.InnerText : "";
-            AntTreeNode targetNode;
+            AntTreeNode result;
             if (targetName == defaultTarget)
             {
-                targetNode = new AntTreeNode(targetName, ICON_PUBLIC_TARGET)
+                result = new AntTreeNode(targetName, ICON_PUBLIC_TARGET)
                 {
                     NodeFont = new Font(tree.Font.Name, tree.Font.Size, FontStyle.Bold)
                 };
             }
-            else if (description.Length > 0) targetNode = new AntTreeNode(targetName, ICON_PUBLIC_TARGET);
-            else targetNode = new AntTreeNode(targetName, ICON_INTERNAL_TARGET);
-            targetNode.Target = targetName;
-            targetNode.ToolTipText = description;
-            return targetNode;
+            else if (!string.IsNullOrEmpty(description)) result = new AntTreeNode(targetName, ICON_PUBLIC_TARGET);
+            else result = new AntTreeNode(targetName, ICON_INTERNAL_TARGET);
+            result.Target = targetName;
+            result.ToolTipText = description;
+            return result;
         }
 
         /// <summary>
@@ -250,7 +247,7 @@ namespace AntPanel
             if (node == null) return;
             PluginBase.MainForm.OpenEditableDocument(node.File, false);
             ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
-            Match match = Regex.Match(sci.Text, "<target[^>]+name\\s*=\\s*\"" + node.Target + "\".*>", RegexOptions.Compiled);
+            Match match = Regex.Match(sci.Text, string.Format("<target[^>]+name\\s*=\\s*\"{0}\".*>", node.Target), RegexOptions.Compiled);
             if (!match.Success) return;
             sci.GotoPos(match.Index);
             sci.SetSel(match.Index, match.Index + match.Length);

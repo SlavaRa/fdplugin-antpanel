@@ -19,22 +19,8 @@ namespace AntPanel
     /// </summary>
     public class PluginMain : IPlugin
 	{
-        const string PLUGIN_NAME = "AntPanel";
-        const string PLUGIN_GUID = "92d9a647-6cd3-4347-9db6-95f324292399";
-        const string PLUGIN_HELP = "http://www.flashdevelop.org/community/";
-        const string PLUGIN_AUTH = "Canab, SlavaRa";
-	    const string SETTINGS_FILE = "Settings.fdb";
-        const string PLUGIN_DESC = "AntPanel Plugin For FlashDevelop";
-        const string STORAGE_FILE_NAME = "antPanelData.txt";
-
-        /// <summary>
-        /// </summary>
-        public List<string> BuildFilesList { get; private set; }
-
-	    Image pluginImage;
-        string settingFilename;
-        Settings settings;
-	    PluginUI pluginUI;
+        public readonly List<string> BuildFilesList = new List<string>();
+        public string StorageFileName { get { return "antPanelData.txt"; }}
         readonly Dictionary<DockState, DockState> panelDockStateToNewState = new Dictionary<DockState, DockState>
         {
             { DockState.DockBottom, DockState.DockBottomAutoHide },
@@ -42,6 +28,9 @@ namespace AntPanel
             { DockState.DockRight, DockState.DockRightAutoHide },
             { DockState.DockTop, DockState.DockTopAutoHide }
         };
+        string settingFilename;
+        Image pluginImage;
+        PluginUI pluginUI;
         DockContent pluginPanel;
         TreeView projectTree;
 
@@ -51,37 +40,37 @@ namespace AntPanel
         /// Api level of the plugin
         /// </summary>
         public int Api { get { return 1; }}
-        
+
         /// <summary>
         /// Name of the plugin
         /// </summary> 
-        public string Name { get { return PLUGIN_NAME; }}
+        public string Name { get { return "AntPanel"; }}
 
         /// <summary>
         /// GUID of the plugin
         /// </summary>
-        public string Guid { get { return PLUGIN_GUID; }}
+        public string Guid { get { return "92d9a647-6cd3-4347-9db6-95f324292399"; }}
 
         /// <summary>
         /// Author of the plugin
         /// </summary> 
-        public string Author { get { return PLUGIN_AUTH; }}
+        public string Author { get { return "Canab, SlavaRa"; }}
 
         /// <summary>
         /// Description of the plugin
         /// </summary> 
-        public string Description { get { return PLUGIN_DESC; }}
+        public string Description { get { return "AntPanel Plugin For FlashDevelop"; }}
 
         /// <summary>
         /// Web address for help
         /// </summary> 
-        public string Help { get { return PLUGIN_HELP; }}
+        public string Help { get { return "http://www.flashdevelop.org/community/"; }}
 
         /// <summary>
         /// Object that contains the settings
         /// </summary>
         [Browsable(false)]
-        public object Settings { get { return settings; }}
+        public object Settings { get; private set; }
 		
 		#endregion
 		
@@ -185,22 +174,22 @@ namespace AntPanel
 	    /// <param name="target"></param>
 	    public void RunTarget(string file, string target)
         {
-            string command = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+	        string antPath = ((AntPanel.Settings)Settings).AntPath;
+	        string command = Path.Combine(Environment.SystemDirectory, "cmd.exe");
             string arguments = "/c ";
-            if (string.IsNullOrEmpty(settings.AntPath)) arguments += "ant";
-            else arguments += Path.Combine(Path.Combine(settings.AntPath, "bin"), "ant");
-            arguments += " -buildfile \"" + file + "\" \"" + target + "\"";
+            if (string.IsNullOrEmpty(antPath)) arguments += "ant";
+            else arguments += Path.Combine(Path.Combine(antPath, "bin"), "ant");
+            arguments += string.Format(" -buildfile \"{0}\" \"{1}\"", file, target);
             PluginBase.MainForm.CallCommand("RunProcessCaptured", command + ";" + arguments);
         }
 
         /// <summary>
         /// </summary>
-        /// <exception cref="OutOfMemoryException">There is insufficient memory to allocate a buffer for the returned string. </exception>
         public void ReadBuildFiles()
         {
             BuildFilesList.Clear();
             string folder = GetBuildFilesStorageFolder();
-            string fullName = Path.Combine(folder, STORAGE_FILE_NAME);
+            string fullName = Path.Combine(folder, StorageFileName);
             if (!File.Exists(fullName)) return;
             StreamReader file = new StreamReader(fullName);
             string line;
@@ -218,11 +207,10 @@ namespace AntPanel
         /// </summary>
         void InitBasics()
         {
-            BuildFilesList = new List<string>();
             pluginImage = PluginBase.MainForm.FindImage("486");
-            string dataPath = Path.Combine(PathHelper.DataDir, PLUGIN_NAME);
+            string dataPath = Path.Combine(PathHelper.DataDir, "AntPanel");
             if (!Directory.Exists(dataPath)) Directory.CreateDirectory(dataPath);
-            settingFilename = Path.Combine(dataPath, SETTINGS_FILE);
+            settingFilename = Path.Combine(dataPath, "Settings.fdb");
         }
 
         /// <summary>
@@ -243,7 +231,7 @@ namespace AntPanel
         {
             pluginUI = new PluginUI(this) {Text = "Ant"};
             pluginUI.OnChange += OnPluginUIChange;
-            pluginPanel = PluginBase.MainForm.CreateDockablePanel(pluginUI, PLUGIN_GUID, pluginImage, DockState.DockRight);
+            pluginPanel = PluginBase.MainForm.CreateDockablePanel(pluginUI, Guid, pluginImage, DockState.DockRight);
         }
 
 	    /// <summary>
@@ -251,9 +239,9 @@ namespace AntPanel
         /// </summary>
         void LoadSettings()
         {
-            settings = new Settings();
+            Settings = new AntPanel.Settings();
             if (!File.Exists(settingFilename)) SaveSettings();
-            else settings = (Settings)ObjectSerializer.Deserialize(settingFilename, settings);
+            else Settings = (AntPanel.Settings)ObjectSerializer.Deserialize(settingFilename, Settings);
         }
 
         /// <summary>
@@ -261,7 +249,7 @@ namespace AntPanel
         /// </summary>
         void SaveSettings()
         {
-            ObjectSerializer.Serialize(settingFilename, settings);
+            ObjectSerializer.Serialize(settingFilename, Settings);
         }
 
         /// <summary>
@@ -277,7 +265,7 @@ namespace AntPanel
         void SaveBuildFiles()
         {
             string folder = GetBuildFilesStorageFolder();
-            string fullName = Path.Combine(folder, STORAGE_FILE_NAME);
+            string fullName = Path.Combine(folder, StorageFileName);
             if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
             StreamWriter file = new StreamWriter(fullName);
             foreach (string line in BuildFilesList)
