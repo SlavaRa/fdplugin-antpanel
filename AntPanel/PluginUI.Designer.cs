@@ -121,6 +121,7 @@ namespace AntPanel
             this.tree.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnTreeKeyDown);
             this.tree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnTreeMouseDown);
             this.tree.ItemDrag += new ItemDragEventHandler(this.OnTreeItemDrag);
+            this.tree.PreviewKeyDown += new PreviewKeyDownEventHandler(this.OnTreePreviewKeyDown);
             // 
             // imageList
             // 
