@@ -101,7 +101,7 @@ namespace AntPanel
 		/// </summary>
         public void AddEventHandlers()
         {
-            EventManager.AddEventHandler(this, EventType.UIStarted | EventType.Command | EventType.Keys);
+            EventManager.AddEventHandler(this, EventType.UIStarted | EventType.Command);
         }
 
         /// <summary>
@@ -125,17 +125,6 @@ namespace AntPanel
                         case ProjectManagerEvents.TreeSelectionChanged:
                             OnTreeSelectionChanged();
                             break;
-                    }
-                    break;
-                case EventType.Keys:
-                    KeyEvent ke = (KeyEvent)e;
-                    if (ke.Value == PluginBase.MainForm.GetShortcutItemKeys("ViewMenu.ShowAntPanel") && !pluginPanel.IsHidden && pluginPanel.IsActivated)
-                    {
-                        DockState dockState;
-                        if (panelDockStateToNewState.TryGetValue(pluginPanel.DockState, out dockState))
-                            pluginPanel.DockState = dockState;
-                        pluginPanel.DockHandler.GiveUpFocus();
-                        e.Handled = true;    
                     }
                     break;
             }
@@ -174,7 +163,7 @@ namespace AntPanel
 	    /// <param name="target"></param>
 	    public void RunTarget(string file, string target)
         {
-	        string antPath = ((AntPanel.Settings)Settings).AntPath;
+	        string antPath = ((Settings)Settings).AntPath;
 	        string command = Path.Combine(Environment.SystemDirectory, "cmd.exe");
             string arguments = "/c ";
             if (string.IsNullOrEmpty(antPath)) arguments += "ant";

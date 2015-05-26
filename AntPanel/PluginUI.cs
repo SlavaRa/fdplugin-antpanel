@@ -13,7 +13,7 @@ namespace AntPanel
 {
     /// <summary>
     /// </summary>
-    public partial class PluginUI : UserControl
+    public partial class PluginUI : DockPanelControl
     {
         const int ICON_FILE = 0;
         const int ICON_INTERNAL_TARGET = 2;
@@ -45,6 +45,7 @@ namespace AntPanel
         public PluginUI(PluginMain pluginMain)
         {
             this.pluginMain = pluginMain;
+            AutoKeyHandling = true;
             InitializeImages();
             InitializeComponent();
             toolStrip.Renderer = new DockPanelStripRenderer();
