@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
 using PluginCore;
-using PluginCore.Managers;
 using ScintillaNet;
 
 namespace AntPanel
