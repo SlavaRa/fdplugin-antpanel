@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
 using PluginCore;
+using PluginCore.Managers;
 using ScintillaNet;
 
 namespace AntPanel
@@ -294,6 +295,11 @@ namespace AntPanel
         void OnTreeNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             RunSelectedTarget();
+        }
+
+        void OnTreePreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == EDIT_KEYS || e.KeyCode == DEL_KEYS) e.IsInputKey = true;
         }
 
         void OnTreeKeyDown(object sender, KeyEventArgs e)
