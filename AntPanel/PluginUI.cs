@@ -57,23 +57,6 @@ namespace AntPanel
 
         /// <summary>
         /// </summary>
-        public void RefreshData()
-        {
-            Enabled = (PluginBase.CurrentProject != null);
-            if (Enabled) 
-            {
-                FillTree();
-                UpdateButtons();
-            }
-            else
-            {
-                tree.Nodes.Clear();
-                tree.Nodes.Add(new TreeNode("No project opened"));
-            }
-        }
-
-        /// <summary>
-        /// </summary>
         void InitializeImages()
         {
             removeImage = PluginBase.MainForm.FindImage("153");
@@ -138,6 +121,23 @@ namespace AntPanel
             tree.DragEnter += OnTreeDragEnter;
             tree.DragDrop += OnTreeDragDrop;
             tree.DragOver += OnTreeDragOver;
+        }
+
+        /// <summary>
+        /// </summary>
+        public void RefreshData()
+        {
+            Enabled = PluginBase.CurrentProject != null;
+            if (Enabled)
+            {
+                FillTree();
+                UpdateButtons();
+            }
+            else
+            {
+                tree.Nodes.Clear();
+                tree.Nodes.Add(new TreeNode("No project opened"));
+            }
         }
 
         /// <summary>
