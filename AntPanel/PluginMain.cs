@@ -21,13 +21,6 @@ namespace AntPanel
 	{
         public readonly List<string> BuildFilesList = new List<string>();
         public string StorageFileName { get { return "antPanelData.txt"; }}
-        readonly Dictionary<DockState, DockState> panelDockStateToNewState = new Dictionary<DockState, DockState>
-        {
-            { DockState.DockBottom, DockState.DockBottomAutoHide },
-            { DockState.DockLeft, DockState.DockLeftAutoHide },
-            { DockState.DockRight, DockState.DockRightAutoHide },
-            { DockState.DockTop, DockState.DockTopAutoHide }
-        };
         string settingFilename;
         Image pluginImage;
         PluginUI pluginUI;
@@ -228,9 +221,9 @@ namespace AntPanel
         /// </summary>
         void LoadSettings()
         {
-            Settings = new AntPanel.Settings();
+            Settings = new Settings();
             if (!File.Exists(settingFilename)) SaveSettings();
-            else Settings = (AntPanel.Settings)ObjectSerializer.Deserialize(settingFilename, Settings);
+            else Settings = (Settings)ObjectSerializer.Deserialize(settingFilename, Settings);
         }
 
         /// <summary>
