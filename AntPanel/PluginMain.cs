@@ -20,7 +20,7 @@ namespace AntPanel
     public class PluginMain : IPlugin
 	{
         public readonly List<string> BuildFilesList = new List<string>();
-        public string StorageFileName { get { return "antPanelData.txt"; }}
+        public string StorageFileName => "antPanelData.txt";
         string settingFilename;
         Image pluginImage;
         PluginUI pluginUI;
@@ -32,32 +32,32 @@ namespace AntPanel
         /// <summary>
         /// Api level of the plugin
         /// </summary>
-        public int Api { get { return 1; }}
+        public int Api => 1;
 
         /// <summary>
         /// Name of the plugin
         /// </summary> 
-        public string Name { get { return "AntPanel"; }}
+        public string Name => "AntPanel";
 
         /// <summary>
         /// GUID of the plugin
         /// </summary>
-        public string Guid { get { return "92d9a647-6cd3-4347-9db6-95f324292399"; }}
+        public string Guid => "92d9a647-6cd3-4347-9db6-95f324292399";
 
         /// <summary>
         /// Author of the plugin
         /// </summary> 
-        public string Author { get { return "Canab, SlavaRa"; }}
+        public string Author => "Canab, SlavaRa";
 
         /// <summary>
         /// Description of the plugin
         /// </summary> 
-        public string Description { get { return "AntPanel Plugin For FlashDevelop"; }}
+        public string Description => "AntPanel Plugin For FlashDevelop";
 
         /// <summary>
         /// Web address for help
         /// </summary> 
-        public string Help { get { return "http://www.flashdevelop.org/community/"; }}
+        public string Help => "http://www.flashdevelop.org/community/";
 
         /// <summary>
         /// Object that contains the settings
@@ -84,18 +84,12 @@ namespace AntPanel
 	    /// <summary>
 		/// Disposes the plugin
 		/// </summary>
-		public void Dispose()
-		{
-            SaveSettings();
-		}
-		
-		/// <summary>
+		public void Dispose() => SaveSettings();
+
+        /// <summary>
 		/// Handles the incoming events
 		/// </summary>
-        public void AddEventHandlers()
-        {
-            EventManager.AddEventHandler(this, EventType.UIStarted | EventType.Command);
-        }
+        public void AddEventHandlers() => EventManager.AddEventHandler(this, EventType.UIStarted | EventType.Command);
 
         /// <summary>
         /// Handles the incoming events
@@ -132,11 +126,9 @@ namespace AntPanel
 	    /// <param name="files"></param>
 	    public void AddBuildFiles(IEnumerable<string> files)
         {
-            foreach (string file in files.Where(file => !BuildFilesList.Contains(file)))
-            {
-                BuildFilesList.Add(file);
-            }
-            SaveBuildFiles();
+	        foreach (string file in files.Where(file => !BuildFilesList.Contains(file)))
+	            BuildFilesList.Add(file);
+	        SaveBuildFiles();
             pluginUI.RefreshData();
         }
 
@@ -161,7 +153,7 @@ namespace AntPanel
             string arguments = "/c ";
             if (string.IsNullOrEmpty(antPath)) arguments += "ant";
             else arguments += Path.Combine(Path.Combine(antPath, "bin"), "ant");
-            arguments += string.Format(" -buildfile \"{0}\" \"{1}\"", file, target);
+            arguments += $" -buildfile \"{file}\" \"{target}\"";
             PluginBase.MainForm.CallCommand("RunProcessCaptured", command + ";" + arguments);
         }
 
@@ -176,7 +168,8 @@ namespace AntPanel
             StreamReader file = new StreamReader(fullName);
             string line;
             while ((line = file.ReadLine()) != null)
-                if (!string.IsNullOrEmpty(line) && !BuildFilesList.Contains(line)) BuildFilesList.Add(line);
+                if (!string.IsNullOrEmpty(line) && !BuildFilesList.Contains(line))
+                    BuildFilesList.Add(line);
             file.Close();
         }
 
@@ -229,18 +222,12 @@ namespace AntPanel
         /// <summary>
         /// Saves the plugin settings
         /// </summary>
-        void SaveSettings()
-        {
-            ObjectSerializer.Serialize(settingFilename, Settings);
-        }
+        void SaveSettings() => ObjectSerializer.Serialize(settingFilename, Settings);
 
         /// <summary>
         /// Opens the plugin panel if closed
         /// </summary>
-        void OpenPanel(object sender, EventArgs e)
-        {
-            pluginPanel.Show();
-        }
+        void OpenPanel(object sender, EventArgs e) => pluginPanel.Show();
 
         /// <summary>
         /// </summary>
@@ -258,23 +245,17 @@ namespace AntPanel
         /// <summary>
         /// </summary>
         /// <returns></returns>
-        static string GetBuildFilesStorageFolder()
-        {
-            return Path.Combine(Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath), "obj");
-        }
+        static string GetBuildFilesStorageFolder() => Path.Combine(Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath), "obj");
 
-		#endregion
+        #endregion
 
         #region Event Handlers
 
-        void OnDirectoryNodeRefresh(DirectoryNode node)
-        {
-            projectTree = node.TreeView;
-        }
+        void OnDirectoryNodeRefresh(DirectoryNode node) => projectTree = node.TreeView;
 
         void OnTreeSelectionChanged()
         {
-            if (projectTree == null || !(projectTree.SelectedNode is FileNode)) return;
+            if (!(projectTree?.SelectedNode is FileNode)) return;
             string path = Path.GetFullPath(((FileNode)projectTree.SelectedNode).BackingPath);
             if (BuildFilesList.Contains(path) || Path.GetExtension(path) != ".xml") return;
             projectTree.ContextMenuStrip.Items.Add(new ToolStripSeparator());

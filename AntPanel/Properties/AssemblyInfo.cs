@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // Information about this assembly is defined by the following
@@ -29,4 +28,4 @@ using System.Runtime.InteropServices;
 // numbers with the '*' character (the default):
 
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: GuidAttribute("92d9a647-6cd3-4347-9db6-95f324292399")]
+[assembly: Guid("92d9a647-6cd3-4347-9db6-95f324292399")]
