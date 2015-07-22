@@ -166,8 +166,7 @@ namespace AntPanel
                     for (int i = 0; i < msgLength; i++) text += strings[i];
                     string line = matches[0].Value;
                     string position = (int.Parse(matches[1].Value) - 1).ToString();
-                    string msg = file + $":{line}: chars {position}-{position} : {text}.";
-                    TraceManager.Add(msg, (int) TraceType.Error);
+                    TraceManager.Add($"{file}:{line}: chars {position}-{position} : {text}.", (int) TraceType.Error);
                     PluginBase.MainForm.CallCommand("PluginCommand", "ResultsPanel.ShowResults");
                 }
                 if (node != null) tree.Nodes.Add(node);
