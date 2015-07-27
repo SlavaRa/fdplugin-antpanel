@@ -39,6 +39,7 @@ namespace AntPanel
         IEnumerable<string> dropFiles;
         ContextMenuStrip buildFileMenu;
         ContextMenuStrip targetMenu;
+        ContextMenuStrip errorMenu;
 
         /// <summary>
         /// Initializes a new instance of the AntPanel.PluginUI
@@ -53,8 +54,18 @@ namespace AntPanel
             toolStrip.Renderer = new DockPanelStripRenderer();
             InitializeButtons();
             InitializeContextMenu();
+            SetupTreeImages();
             StartDragHandling();
             RefreshData();
+        }
+
+        void SetupTreeImages()
+        {
+            tree.ImageList.Images.SetKeyName(0, "ant_buildfile.png");
+            tree.ImageList.Images.SetKeyName(1, "defaulttarget_obj.png");
+            tree.ImageList.Images.SetKeyName(2, "targetinternal_obj.png");
+            tree.ImageList.Images.SetKeyName(3, "targetpublic_obj.png");
+            tree.ImageList.Images.Add(PluginBase.MainForm.FindImage("197"));
         }
 
         /// <summary>
@@ -113,6 +124,15 @@ namespace AntPanel
             {
                 ShortcutKeys = EDIT_KEYS
             });
+            errorMenu = new ContextMenuStrip();
+            errorMenu.Items.Add(new ToolStripMenuItem("Show in Editor", editImage, OnMenuEditClick)
+            {
+                ShortcutKeys = EDIT_KEYS
+            });
+            errorMenu.Items.Add(new ToolStripMenuItem("Remove", removeImage, OnMenuRemoveClick)
+            {
+                ShortcutKeys = DEL_KEYS
+            });
         }
 
         /// <summary>
@@ -150,7 +170,7 @@ namespace AntPanel
             tree.Nodes.Clear();
             foreach (string file in pluginMain.BuildFilesList.Where(File.Exists))
             {
-                TreeNode node = null;
+                TreeNode node;
                 try
                 {
                     node = GetBuildFileNode(file);
@@ -168,6 +188,7 @@ namespace AntPanel
                     string position = (int.Parse(matches[1].Value) - 1).ToString();
                     TraceManager.Add($"{file}:{line}: chars {position}-{position} : {text}.", (int) TraceType.Error);
                     PluginBase.MainForm.CallCommand("PluginCommand", "ResultsPanel.ShowResults");
+                    node = new ErrorTreeNode(file, 4, int.Parse(line) - 1, int.Parse(position));
                 }
                 if (node != null) tree.Nodes.Add(node);
             }
@@ -178,7 +199,7 @@ namespace AntPanel
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        TreeNode GetBuildFileNode(string file)
+        AntTreeNode GetBuildFileNode(string file)
         {
             XmlDocument xml = new XmlDocument();
             xml.Load(file);
@@ -255,25 +276,55 @@ namespace AntPanel
         /// </summary>
         void RemoveSelectedTarget()
         {
-            AntTreeNode node = tree.SelectedNode as AntTreeNode;
-            if (node == null) return;
+            TreeNode node = tree.SelectedNode;
+            string file;
+            if (node is AntTreeNode)
+                file = ((AntTreeNode) node).File;
+            else if (node != null) file = node.Text;
+            else return;
             string text = $"\"{node.Text}\" will be removed from AntPanel.";
             if (MessageBox.Show(text, "Confirm", MessageBoxButtons.OKCancel) == DialogResult.OK)
-                pluginMain.RemoveBuildFile(node.File);
+                pluginMain.RemoveBuildFile(file);
         }
 
         /// <summary>
         /// </summary>
         void EditSelectedNode()
         {
-            AntTreeNode node = tree.SelectedNode as AntTreeNode;
+            TreeNode node = tree.SelectedNode;
             if (node == null) return;
-            PluginBase.MainForm.OpenEditableDocument(node.File, false);
+            string file;
+            string target = null;
+            if (node is AntTreeNode)
+            {
+                AntTreeNode antTreeNode = (AntTreeNode)node;
+                file = antTreeNode.File;
+                target = antTreeNode.Target;
+            }
+            else file = node.Text;
+            PluginBase.MainForm.OpenEditableDocument(file, false);
             ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
-            Match match = Regex.Match(sci.Text, $"<target[^>]+name\\s*=\\s*\"{node.Target}\".*>", RegexOptions.Compiled);
-            if (!match.Success) return;
-            sci.GotoPos(match.Index);
-            sci.SetSel(match.Index, match.Index + match.Length);
+            if (!string.IsNullOrEmpty(target))
+            {
+                Match match = Regex.Match(sci.Text, $"<target[^>]+name\\s*=\\s*\"{target}\".*>", RegexOptions.Compiled);
+                if (!match.Success) return;
+                int index = match.Index;
+                sci.SetSel(index, index + match.Length);
+            }
+            else if (node is ErrorTreeNode)
+            {
+                ErrorTreeNode errorTreeNode = (ErrorTreeNode) node;
+                int positionFromLine = sci.PositionFromLine(errorTreeNode.Line);
+                positionFromLine += errorTreeNode.Position;
+                sci.SetSel(positionFromLine, positionFromLine);
+            }
+        }
+
+        void ShowContextMenu(TreeNode node, Point location)
+        {
+            if (node is ErrorTreeNode) errorMenu.Show(tree, location);
+            else if (node.Parent == null) buildFileMenu.Show(tree, location);
+            else targetMenu.Show(tree, location);
         }
 
         #region Event Handlers
@@ -298,10 +349,10 @@ namespace AntPanel
         void OnTreeNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Button != MouseButtons.Right) return;
-            AntTreeNode currentNode = (AntTreeNode) tree.GetNodeAt(e.Location);
-            tree.SelectedNode = currentNode;
-            if (currentNode.Parent == null) buildFileMenu.Show(tree, e.Location);
-            else targetMenu.Show(tree, e.Location);
+            TreeNode node = tree.GetNodeAt(e.Location);
+            if (node == null) return;
+            tree.SelectedNode = node;
+            ShowContextMenu(node, e.Location);
         }
 
         void OnTreeNodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e) => RunSelectedTarget();
@@ -313,8 +364,8 @@ namespace AntPanel
 
         void OnTreeKeyDown(object sender, KeyEventArgs e)
         {
-            TreeNode selectedNode = tree.SelectedNode;
-            if (selectedNode == null) return;
+            TreeNode node = tree.SelectedNode;
+            if (node == null) return;
             switch (e.KeyCode)
             {
                 case EDIT_KEYS:
@@ -324,11 +375,10 @@ namespace AntPanel
                     RunSelectedTarget();
                     break;
                 case Keys.Apps:
-                    if (selectedNode.Parent == null) buildFileMenu.Show(tree, selectedNode.Bounds.Location);
-                    else targetMenu.Show(tree, selectedNode.Bounds.Location);
+                    ShowContextMenu(node, node.Bounds.Location);
                     break;
                 case DEL_KEYS:
-                    if (selectedNode.ImageIndex == ICON_FILE) RemoveSelectedTarget();
+                    if (node.ImageIndex == ICON_FILE || !(node is AntTreeNode)) RemoveSelectedTarget();
                     break;
                 default: return;
             }
@@ -450,6 +500,17 @@ namespace AntPanel
         public AntTreeNode(string text, int imageIndex)
             : base(text, imageIndex, imageIndex)
         {
+        }
+    }
+
+    class ErrorTreeNode : TreeNode
+    {
+        public readonly int Line;
+        public readonly int Position;
+        public ErrorTreeNode(string text, int imageIndex, int line, int position) : base(text, imageIndex, imageIndex)
+        {
+            Line = line;
+            Position = position;
         }
     }
 
