@@ -5,7 +5,7 @@ environment:
   PLUGIN_DESC: Quickly navigate through Types, Fields, Projects and more
   PLUGIN_PATH: C:\projects\FlashDevelop\External\Plugins\AntPanel
   PLUGIN_DLL:  C:\projects\FlashDevelop\FlashDevelop\Bin\Release\Plugins\AntPanel.dll
-  PLUGIN_INFO: http:\/\/www.flashdevelop.org\/community\/viewtopic.php?f=4&t=5961
+  PLUGIN_INFO: http:\/\/www.flashdevelop.org\/community\/viewtopic.php?f=4&t=6105
   PLUGIN_GITHUB_RELEASES: https:\/\/github.com\/SlavaRa\/fdplugin-antpanel\/releases
   APPMAN_TEMPLATE: C:\projects\FlashDevelop\External\Plugins\AntPanel\appman.template
   APPMAN_CONFIG_XML: appman.txt
