@@ -1,5 +1,9 @@
 AntPanel plugin for FlashDevelop
 ===================
-fork of https://code.google.com/p/fd-ant-plugin/
+[![Build status](https://ci.appveyor.com/api/projects/status/o4xf3xo3k7up17ny?svg=true)](https://ci.appveyor.com/project/slavara/fd-antpanel-plugin)
 
-FDZ: https://github.com/SlavaRa/fd-antpanel-plugin/blob/master/AntPanel-2.0.fdz
+### Installation
+
+Download the latest release. Open the .fdz file with FlashDevelop.
+
+https://github.com/SlavaRa/fdplugin-antpanel/releases
