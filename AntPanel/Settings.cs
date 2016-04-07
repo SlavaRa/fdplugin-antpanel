@@ -13,5 +13,9 @@ namespace AntPanel
         [DefaultValue("")]
         [Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
         public string AntPath { get; set; }
+
+        [DisplayName("Hide no-description targets"), DefaultValue(false)]
+        [Description("Hide targets that don't have a description (unless all of the targets don't have one)")]
+        public Boolean SkipHiddenTargets { get; set; }
     }
 }

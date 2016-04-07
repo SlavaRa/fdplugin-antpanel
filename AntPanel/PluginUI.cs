@@ -218,15 +218,34 @@ namespace AntPanel
                 Target = defaultTarget,
                 ToolTipText = description
             };
+            bool skipHiddenTargets = ((Settings)pluginMain.Settings).SkipHiddenTargets;
+            if (skipHiddenTargets)
+            {
+                // no-description targets should be hidden only if at least one target has a description
+                skipHiddenTargets = false;
+                foreach (XmlNode node in documentElement.ChildNodes)
+                {
+                    if (node.Name != "target") continue;
+                    XmlAttributeCollection attributes = node.Attributes;
+                    Debug.Assert(attributes != null, "attributes != null");
+                    if (!string.IsNullOrEmpty(attributes["description"]?.InnerText))
+                    {
+                        skipHiddenTargets = true;
+                        break;
+                    }
+                }
+            }
             foreach (XmlNode node in documentElement.ChildNodes)
             {
                 if (node.Name != "target") continue;
-                // skip private targets
+                // skip private and optionally hidden targets
                 XmlAttributeCollection attributes = node.Attributes;
                 Debug.Assert(attributes != null, "attributes != null");
                 XmlAttribute targetNameAttr = attributes["name"];
                 string targetName = targetNameAttr?.InnerText;
                 if (!string.IsNullOrEmpty(targetName) && (targetName[0] == '-'))
+                    continue;
+                if (skipHiddenTargets && string.IsNullOrEmpty(attributes["description"]?.InnerText))
                     continue;
                 AntTreeNode targetNode = GetBuildTargetNode(node, defaultTarget);
                 targetNode.File = file;
