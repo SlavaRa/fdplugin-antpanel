@@ -101,7 +101,7 @@ namespace AntPanel
         /// </summary>
         void InitializeContextMenu()
         {
-            buildFileMenu = new ContextMenuStrip();
+            buildFileMenu = new ContextMenuStrip {Renderer = new DockPanelStripRenderer(false)};
             buildFileMenu.Items.Add(new ToolStripMenuItem("Run default target", run.Image, OnMenuRunClick)
             {
                 ShortcutKeyDisplayString = "Enter"
