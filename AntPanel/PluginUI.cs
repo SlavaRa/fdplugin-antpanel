@@ -177,12 +177,9 @@ namespace AntPanel
             xml.Load(file);
             var documentElement = xml.DocumentElement;
             Debug.Assert(documentElement != null, "documentElement != null");
-            var defTargetAttr = documentElement.Attributes["default"];
-            var defaultTarget = defTargetAttr?.InnerText ?? "";
-            var nameAttr = documentElement.Attributes["name"];
-            var projectName = nameAttr?.InnerText ?? file;
-            var descrAttr = documentElement.Attributes["description"];
-            var description = descrAttr?.InnerText ?? "";
+            var defaultTarget = documentElement.Attributes["default"]?.InnerText ?? "";
+            var projectName = documentElement.Attributes["name"]?.InnerText ?? file;
+            var description = documentElement.Attributes["description"]?.InnerText ?? "";
             if (string.IsNullOrEmpty(projectName)) projectName = file;
             var rootNode = new AntTreeNode(projectName, IconFile)
             {
@@ -200,11 +197,9 @@ namespace AntPanel
                     if (node.Name != "target") continue;
                     var attributes = node.Attributes;
                     Debug.Assert(attributes != null, "attributes != null");
-                    if (!string.IsNullOrEmpty(attributes["description"]?.InnerText))
-                    {
-                        skipHiddenTargets = true;
-                        break;
-                    }
+                    if (string.IsNullOrEmpty(attributes["description"]?.InnerText)) continue;
+                    skipHiddenTargets = true;
+                    break;
                 }
             }
             foreach (XmlNode node in documentElement.ChildNodes)
@@ -213,8 +208,7 @@ namespace AntPanel
                 // skip private and optionally hidden targets
                 var attributes = node.Attributes;
                 Debug.Assert(attributes != null, "attributes != null");
-                var targetNameAttr = attributes["name"];
-                var targetName = targetNameAttr?.InnerText;
+                var targetName = attributes["name"]?.InnerText;
                 if (!string.IsNullOrEmpty(targetName) && (targetName[0] == '-'))
                     continue;
                 if (skipHiddenTargets && string.IsNullOrEmpty(attributes["description"]?.InnerText))
@@ -231,10 +225,8 @@ namespace AntPanel
         {
             var attributes = node.Attributes;
             Debug.Assert(attributes != null, "attributes != null");
-            var nameAttr = attributes["name"];
-            var targetName = nameAttr?.InnerText ?? string.Empty;
-            var descrAttr = attributes["description"];
-            var description = descrAttr?.InnerText ?? string.Empty;
+            var targetName = attributes["name"]?.InnerText ?? string.Empty;
+            var description = attributes["description"]?.InnerText ?? string.Empty;
             AntTreeNode result;
             if (targetName == defaultTarget)
             {
