@@ -137,7 +137,7 @@ namespace AntPanel
 	    public void RunTarget(string file, string target)
         {
 	        var antPath = ((Settings)Settings).AntPath;
-            var command = PluginBase.MainForm.CommandPromptExecutable ?? Path.Combine(Environment.SystemDirectory, "cmd.exe");
+            var command = /*PluginBase.MainForm.CommandPromptExecutable ??*/ Path.Combine(Environment.SystemDirectory, "cmd.exe");
             var arguments = "/c ";
             if (string.IsNullOrEmpty(antPath)) arguments += "ant";
             else arguments += Path.Combine(Path.Combine(antPath, "bin"), "ant");
