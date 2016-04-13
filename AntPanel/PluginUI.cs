@@ -9,30 +9,18 @@ using System.Windows.Forms;
 using System.Xml;
 using PluginCore;
 using PluginCore.Managers;
-using ScintillaNet;
 
 namespace AntPanel
 {
-    /// <summary>
-    /// </summary>
     public partial class PluginUI : DockPanelControl
     {
-        const int ICON_FILE = 0;
-        const int ICON_INTERNAL_TARGET = 2;
-        const int ICON_PUBLIC_TARGET = 3;
-        const Keys EDIT_KEYS = Keys.F4;
-        const Keys DEL_KEYS = Keys.Delete;
-
-        /// <summary>
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        const int IconFile = 0;
+        const int IconInternalTarget = 2;
+        const int IconPublicTarget = 3;
+        const Keys DelKeys = Keys.Delete;
+        const Keys EditKeys = Keys.F4;
         public delegate void PluginUIEventHandler(object sender, PluginUIArgs e);
-
-        /// <summary>
-        /// </summary>
         public event PluginUIEventHandler OnChange;
-
         readonly PluginMain pluginMain;
         Image removeImage;
         Image editImage;
@@ -68,16 +56,12 @@ namespace AntPanel
             tree.ImageList.Images.Add(PluginBase.MainForm.FindImage("197"));
         }
 
-        /// <summary>
-        /// </summary>
         void InitializeImages()
         {
             removeImage = PluginBase.MainForm.FindImage("153");
             editImage = PluginBase.MainForm.FindImage("214");
         }
 
-        /// <summary>
-        /// </summary>
         void InitializeButtons()
         {
             add.Image = PluginBase.MainForm.FindImage("33");
@@ -86,11 +70,9 @@ namespace AntPanel
             refresh.Image = PluginBase.MainForm.FindImage("66");
         }
 
-        /// <summary>
-        /// </summary>
         void UpdateButtons()
         {
-            bool isNotEmpty = tree.Nodes.Count > 0;
+            var isNotEmpty = tree.Nodes.Count > 0;
             remove.Enabled = isNotEmpty;
             run.Enabled = isNotEmpty;
             refresh.Enabled = isNotEmpty;
@@ -108,12 +90,12 @@ namespace AntPanel
             });
             buildFileMenu.Items.Add(new ToolStripMenuItem("Edit file", editImage, OnMenuEditClick)
             {
-                ShortcutKeys = EDIT_KEYS
+                ShortcutKeys = EditKeys
             });
             buildFileMenu.Items.Add(new ToolStripSeparator());
             buildFileMenu.Items.Add(new ToolStripMenuItem("Remove", removeImage, OnMenuRemoveClick)
             {
-                ShortcutKeys = DEL_KEYS
+                ShortcutKeys = DelKeys
             });
             targetMenu = new ContextMenuStrip();
             targetMenu.Items.Add(new ToolStripMenuItem("Run target", run.Image, OnMenuRunClick)
@@ -122,21 +104,19 @@ namespace AntPanel
             });
             targetMenu.Items.Add(new ToolStripMenuItem("Show in Editor", editImage, OnMenuEditClick)
             {
-                ShortcutKeys = EDIT_KEYS
+                ShortcutKeys = EditKeys
             });
             errorMenu = new ContextMenuStrip();
             errorMenu.Items.Add(new ToolStripMenuItem("Show in Editor", editImage, OnMenuEditClick)
             {
-                ShortcutKeys = EDIT_KEYS
+                ShortcutKeys = EditKeys
             });
             errorMenu.Items.Add(new ToolStripMenuItem("Remove", removeImage, OnMenuRemoveClick)
             {
-                ShortcutKeys = DEL_KEYS
+                ShortcutKeys = DelKeys
             });
         }
 
-        /// <summary>
-        /// </summary>
         void StartDragHandling()
         {
             tree.AllowDrop = true;
@@ -145,8 +125,6 @@ namespace AntPanel
             tree.DragOver += OnTreeDragOver;
         }
 
-        /// <summary>
-        /// </summary>
         public void RefreshData()
         {
             Enabled = PluginBase.CurrentProject != null;
@@ -162,13 +140,11 @@ namespace AntPanel
             }
         }
 
-        /// <summary>
-        /// </summary>
         void FillTree()
         {
             tree.BeginUpdate();
             tree.Nodes.Clear();
-            foreach (string file in pluginMain.BuildFilesList.Where(File.Exists))
+            foreach (var file in pluginMain.BuildFilesList.Where(File.Exists))
             {
                 TreeNode node;
                 try
@@ -177,15 +153,15 @@ namespace AntPanel
                 }
                 catch (Exception ex)
                 {
-                    string[] strings = ex.Message.Split('.');
-                    int msgLength = strings.Length - 2;
-                    string positions = strings[msgLength];
-                    MatchCollection matches = Regex.Matches(positions, @"(\d+)");
+                    var strings = ex.Message.Split('.');
+                    var msgLength = strings.Length - 2;
+                    var positions = strings[msgLength];
+                    var matches = Regex.Matches(positions, @"(\d+)");
                     if (matches.Count == 0) return;
-                    string text = string.Empty;
-                    for (int i = 0; i < msgLength; i++) text += strings[i];
-                    string line = matches[0].Value;
-                    string position = (int.Parse(matches[1].Value) - 1).ToString();
+                    var text = string.Empty;
+                    for (var i = 0; i < msgLength; i++) text += strings[i];
+                    var line = matches[0].Value;
+                    var position = (int.Parse(matches[1].Value) - 1).ToString();
                     TraceManager.Add($"{file}:{line}: chars {position}-{position} : {text}.", (int) TraceType.Error);
                     PluginBase.MainForm.CallCommand("PluginCommand", "ResultsPanel.ShowResults");
                     node = new ErrorTreeNode(file, 4, int.Parse(line) - 1, int.Parse(position));
@@ -195,30 +171,26 @@ namespace AntPanel
             tree.EndUpdate();
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
         AntTreeNode GetBuildFileNode(string file)
         {
-            XmlDocument xml = new XmlDocument();
+            var xml = new XmlDocument();
             xml.Load(file);
-            XmlElement documentElement = xml.DocumentElement;
+            var documentElement = xml.DocumentElement;
             Debug.Assert(documentElement != null, "documentElement != null");
-            XmlAttribute defTargetAttr = documentElement.Attributes["default"];
-            string defaultTarget = defTargetAttr?.InnerText ?? "";
-            XmlAttribute nameAttr = documentElement.Attributes["name"];
-            string projectName = nameAttr?.InnerText ?? file;
-            XmlAttribute descrAttr = documentElement.Attributes["description"];
-            string description = descrAttr?.InnerText ?? "";
+            var defTargetAttr = documentElement.Attributes["default"];
+            var defaultTarget = defTargetAttr?.InnerText ?? "";
+            var nameAttr = documentElement.Attributes["name"];
+            var projectName = nameAttr?.InnerText ?? file;
+            var descrAttr = documentElement.Attributes["description"];
+            var description = descrAttr?.InnerText ?? "";
             if (string.IsNullOrEmpty(projectName)) projectName = file;
-            AntTreeNode rootNode = new AntTreeNode(projectName, ICON_FILE)
+            var rootNode = new AntTreeNode(projectName, IconFile)
             {
                 File = file,
                 Target = defaultTarget,
                 ToolTipText = description
             };
-            bool skipHiddenTargets = ((Settings)pluginMain.Settings).SkipHiddenTargets;
+            var skipHiddenTargets = ((Settings)pluginMain.Settings).SkipHiddenTargets;
             if (skipHiddenTargets)
             {
                 // no-description targets should be hidden only if at least one target has a description
@@ -226,7 +198,7 @@ namespace AntPanel
                 foreach (XmlNode node in documentElement.ChildNodes)
                 {
                     if (node.Name != "target") continue;
-                    XmlAttributeCollection attributes = node.Attributes;
+                    var attributes = node.Attributes;
                     Debug.Assert(attributes != null, "attributes != null");
                     if (!string.IsNullOrEmpty(attributes["description"]?.InnerText))
                     {
@@ -239,15 +211,15 @@ namespace AntPanel
             {
                 if (node.Name != "target") continue;
                 // skip private and optionally hidden targets
-                XmlAttributeCollection attributes = node.Attributes;
+                var attributes = node.Attributes;
                 Debug.Assert(attributes != null, "attributes != null");
-                XmlAttribute targetNameAttr = attributes["name"];
-                string targetName = targetNameAttr?.InnerText;
+                var targetNameAttr = attributes["name"];
+                var targetName = targetNameAttr?.InnerText;
                 if (!string.IsNullOrEmpty(targetName) && (targetName[0] == '-'))
                     continue;
                 if (skipHiddenTargets && string.IsNullOrEmpty(attributes["description"]?.InnerText))
                     continue;
-                AntTreeNode targetNode = GetBuildTargetNode(node, defaultTarget);
+                var targetNode = GetBuildTargetNode(node, defaultTarget);
                 targetNode.File = file;
                 rootNode.Nodes.Add(targetNode);
             }
@@ -255,47 +227,38 @@ namespace AntPanel
             return rootNode;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="defaultTarget"></param>
-        /// <returns></returns>
         AntTreeNode GetBuildTargetNode(XmlNode node, string defaultTarget)
         {
-            XmlAttributeCollection attributes = node.Attributes;
+            var attributes = node.Attributes;
             Debug.Assert(attributes != null, "attributes != null");
-            XmlAttribute nameAttr = attributes["name"];
-            string targetName = nameAttr?.InnerText ?? "";
-            XmlAttribute descrAttr = attributes["description"];
-            string description = descrAttr?.InnerText ?? "";
+            var nameAttr = attributes["name"];
+            var targetName = nameAttr?.InnerText ?? string.Empty;
+            var descrAttr = attributes["description"];
+            var description = descrAttr?.InnerText ?? string.Empty;
             AntTreeNode result;
             if (targetName == defaultTarget)
             {
-                result = new AntTreeNode(targetName, ICON_PUBLIC_TARGET)
+                result = new AntTreeNode(targetName, IconPublicTarget)
                 {
                     NodeFont = new Font(tree.Font.Name, tree.Font.Size, FontStyle.Bold)
                 };
             }
-            else if (!string.IsNullOrEmpty(description)) result = new AntTreeNode(targetName, ICON_PUBLIC_TARGET);
-            else result = new AntTreeNode(targetName, ICON_INTERNAL_TARGET);
+            else if (!string.IsNullOrEmpty(description)) result = new AntTreeNode(targetName, IconPublicTarget);
+            else result = new AntTreeNode(targetName, IconInternalTarget);
             result.Target = targetName;
             result.ToolTipText = description;
             return result;
         }
 
-        /// <summary>
-        /// </summary>
         void RunSelectedTarget()
         {
-            AntTreeNode node = tree.SelectedNode as AntTreeNode;
+            var node = tree.SelectedNode as AntTreeNode;
             if (node != null) pluginMain.RunTarget(node.File, node.Target);
         }
 
-        /// <summary>
-        /// </summary>
         void RemoveSelectedTarget()
         {
-            TreeNode node = tree.SelectedNode;
+            var node = tree.SelectedNode;
             string file;
             if (node is AntTreeNode)
                 file = ((AntTreeNode) node).File;
@@ -306,34 +269,32 @@ namespace AntPanel
                 pluginMain.RemoveBuildFile(file);
         }
 
-        /// <summary>
-        /// </summary>
         void EditSelectedNode()
         {
-            TreeNode node = tree.SelectedNode;
+            var node = tree.SelectedNode;
             if (node == null) return;
             string file;
             string target = null;
             if (node is AntTreeNode)
             {
-                AntTreeNode antTreeNode = (AntTreeNode)node;
+                var antTreeNode = (AntTreeNode)node;
                 file = antTreeNode.File;
                 target = antTreeNode.Target;
             }
             else file = node.Text;
             PluginBase.MainForm.OpenEditableDocument(file, false);
-            ScintillaControl sci = PluginBase.MainForm.CurrentDocument.SciControl;
+            var sci = PluginBase.MainForm.CurrentDocument.SciControl;
             if (!string.IsNullOrEmpty(target))
             {
-                Match match = Regex.Match(sci.Text, $"<target[^>]+name\\s*=\\s*\"{target}\".*>", RegexOptions.Compiled);
+                var match = Regex.Match(sci.Text, $"<target[^>]+name\\s*=\\s*\"{target}\".*>", RegexOptions.Compiled);
                 if (!match.Success) return;
-                int index = match.Index;
+                var index = match.Index;
                 sci.SetSel(index, index + match.Length);
             }
             else if (node is ErrorTreeNode)
             {
-                ErrorTreeNode errorTreeNode = (ErrorTreeNode) node;
-                int positionFromLine = sci.PositionFromLine(errorTreeNode.Line);
+                var errorTreeNode = (ErrorTreeNode) node;
+                var positionFromLine = sci.PositionFromLine(errorTreeNode.Line);
                 positionFromLine += errorTreeNode.Position;
                 sci.SetSel(positionFromLine, positionFromLine);
             }
@@ -350,7 +311,7 @@ namespace AntPanel
 
         void OnAddClick(object sender, EventArgs e)
         {
-            OpenFileDialog dialog = new OpenFileDialog
+            var dialog = new OpenFileDialog
             {
                 Filter = "BuildFiles (*.xml)|*.XML|All files (*.*)|*.*",
                 Multiselect = true
@@ -368,7 +329,7 @@ namespace AntPanel
         void OnTreeNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Button != MouseButtons.Right) return;
-            TreeNode node = tree.GetNodeAt(e.Location);
+            var node = tree.GetNodeAt(e.Location);
             if (node == null) return;
             tree.SelectedNode = node;
             ShowContextMenu(node, e.Location);
@@ -378,35 +339,27 @@ namespace AntPanel
 
         void OnTreePreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            if (e.KeyCode == EDIT_KEYS || e.KeyCode == DEL_KEYS) e.IsInputKey = true;
+            if (e.KeyCode == EditKeys || e.KeyCode == DelKeys) e.IsInputKey = true;
         }
 
         void OnTreeKeyDown(object sender, KeyEventArgs e)
         {
-            TreeNode node = tree.SelectedNode;
+            var node = tree.SelectedNode;
             if (node == null) return;
-            switch (e.KeyCode)
+            if (e.KeyCode == EditKeys) EditSelectedNode();
+            else if (e.KeyCode == Keys.Enter) RunSelectedTarget();
+            else if (e.KeyCode == Keys.Apps) ShowContextMenu(node, node.Bounds.Location);
+            else if (e.KeyCode == DelKeys)
             {
-                case EDIT_KEYS:
-                    EditSelectedNode();
-                    break;
-                case Keys.Enter:
-                    RunSelectedTarget();
-                    break;
-                case Keys.Apps:
-                    ShowContextMenu(node, node.Bounds.Location);
-                    break;
-                case DEL_KEYS:
-                    if (node.ImageIndex == ICON_FILE || !(node is AntTreeNode)) RemoveSelectedTarget();
-                    break;
-                default: return;
+                if (node.ImageIndex == IconFile || !(node is AntTreeNode)) RemoveSelectedTarget();
             }
+            else return;
             e.Handled = true;
         }
 
         void OnTreeMouseDown(object sender, MouseEventArgs e)
         {
-            int delta = (int)DateTime.Now.Subtract(lastMouseDown).TotalMilliseconds;
+            var delta = (int)DateTime.Now.Subtract(lastMouseDown).TotalMilliseconds;
             preventExpand = delta < SystemInformation.DoubleClickTime;
             lastMouseDown = DateTime.Now;
         }
@@ -428,14 +381,14 @@ namespace AntPanel
             if (e.Data.GetDataPresent("AntPanel.AntTreeNode"))
             {
                 TreeNode node = (AntTreeNode)e.Data.GetData(("AntPanel.AntTreeNode"));
-                if (node.ImageIndex != ICON_FILE) return;
+                if (node.ImageIndex != IconFile) return;
                 tree.SelectedNode = null;
                 e.Effect = DragDropEffects.Move;
             }
             else
             {
-                string[] s = (string[])e.Data.GetData(DataFormats.FileDrop);
-                IEnumerable<string> xmls = s.Where(t => t.EndsWith(".xml", true, null));
+                var s = (string[])e.Data.GetData(DataFormats.FileDrop);
+                var xmls = s.Where(t => t.EndsWith(".xml", true, null));
                 if (xmls.Any())
                 {
                     e.Effect = DragDropEffects.Copy;
@@ -450,11 +403,11 @@ namespace AntPanel
             if (e.Data.GetDataPresent("AntPanel.AntTreeNode"))
             {
                 TreeNode node = (AntTreeNode)e.Data.GetData(("AntPanel.AntTreeNode"));
-                if (node.ImageIndex != ICON_FILE) return;
-                Point p = tree.PointToClient(new Point(e.X, e.Y));
-                TreeNode dropTarget = tree.GetNodeAt(p);
+                if (node.ImageIndex != IconFile) return;
+                var p = tree.PointToClient(new Point(e.X, e.Y));
+                var dropTarget = tree.GetNodeAt(p);
                 if (dropTarget == null) dropTarget = tree.Nodes[tree.Nodes.Count - 1];
-                else if (dropTarget.ImageIndex != ICON_FILE) dropTarget = dropTarget.Parent;
+                else if (dropTarget.ImageIndex != IconFile) dropTarget = dropTarget.Parent;
                 tree.SelectedNode = dropTarget;
             }
             else if (dropFiles != null) e.Effect = DragDropEffects.Copy;
@@ -465,9 +418,9 @@ namespace AntPanel
             if (e.Data.GetDataPresent("AntPanel.AntTreeNode"))
             {
                 TreeNode node = (AntTreeNode)e.Data.GetData(("AntPanel.AntTreeNode"));
-                if (node.ImageIndex != ICON_FILE) return;
-                Point p = tree.PointToClient(new Point(e.X, e.Y));
-                TreeNode dropTarget = tree.GetNodeAt(p);
+                if (node.ImageIndex != IconFile) return;
+                var p = tree.PointToClient(new Point(e.X, e.Y));
+                var dropTarget = tree.GetNodeAt(p);
                 if (dropTarget == null)
                 {
                     node.Remove();
@@ -475,14 +428,14 @@ namespace AntPanel
                 }
                 else
                 {
-                    if (dropTarget.ImageIndex != ICON_FILE) dropTarget = dropTarget.Parent;
-                    int index = dropTarget.Index;
+                    if (dropTarget.ImageIndex != IconFile) dropTarget = dropTarget.Parent;
+                    var index = dropTarget.Index;
                     node.Remove();
                     tree.Nodes.Insert(index, node);
                 }
                 tree.SelectedNode = node;
                 if (OnChange == null) return;
-                List<string> paths = (from AntTreeNode antTreeNode in tree.Nodes select antTreeNode.File).ToList();
+                var paths = (from AntTreeNode antTreeNode in tree.Nodes select antTreeNode.File).ToList();
                 OnChange(this, new PluginUIArgs(paths));
             }
             else if (dropFiles != null) pluginMain.AddBuildFiles(dropFiles);
@@ -499,16 +452,9 @@ namespace AntPanel
         #endregion
     }
 
-    /// <summary>
-    /// </summary>
     class AntTreeNode : TreeNode
     {
-        /// <summary>
-        /// </summary>
         public string File;
-
-        /// <summary>
-        /// </summary>
         public string Target;
 
         /// <summary>
@@ -516,8 +462,7 @@ namespace AntPanel
         /// </summary>
         /// <param name="text"></param>
         /// <param name="imageIndex"></param>
-        public AntTreeNode(string text, int imageIndex)
-            : base(text, imageIndex, imageIndex)
+        public AntTreeNode(string text, int imageIndex) : base(text, imageIndex, imageIndex)
         {
         }
     }
@@ -533,8 +478,6 @@ namespace AntPanel
         }
     }
 
-    /// <summary>
-    /// </summary>
     public class PluginUIArgs
     {
         /// <summary>
@@ -546,8 +489,6 @@ namespace AntPanel
             Paths = paths;
         }
 
-        /// <summary>
-        /// </summary>
         public IEnumerable<string> Paths { get; private set; }
     }
 }

@@ -15,8 +15,6 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace AntPanel
 {
-    /// <summary>
-    /// </summary>
     public class PluginMain : IPlugin
 	{
         public readonly List<string> BuildFilesList = new List<string>();
@@ -87,8 +85,8 @@ namespace AntPanel
 		public void Dispose() => SaveSettings();
 
         /// <summary>
-		/// Handles the incoming events
-		/// </summary>
+        /// Adds the required event handlers
+        /// </summary>
         public void AddEventHandlers() => EventManager.AddEventHandler(this, EventType.UIStarted | EventType.Command);
 
         /// <summary>
@@ -102,7 +100,7 @@ namespace AntPanel
                     DirectoryNode.OnDirectoryNodeRefresh += OnDirectoryNodeRefresh;
                     break;
                 case EventType.Command:
-                    DataEvent da = (DataEvent)e;
+                    var da = (DataEvent)e;
                     switch (da.Action)
                     {
                         case ProjectManagerEvents.Project:
@@ -121,20 +119,14 @@ namespace AntPanel
 
         #region Custom Public Methods
 
-	    /// <summary>
-	    /// </summary>
-	    /// <param name="files"></param>
 	    public void AddBuildFiles(IEnumerable<string> files)
         {
-	        foreach (string file in files.Where(file => !BuildFilesList.Contains(file)))
+	        foreach (var file in files.Where(file => !BuildFilesList.Contains(file)))
 	            BuildFilesList.Add(file);
 	        SaveBuildFiles();
             pluginUI.RefreshData();
         }
 
-	    /// <summary>
-	    /// </summary>
-	    /// <param name="file"></param>
 	    public void RemoveBuildFile(string file)
         {
             if (BuildFilesList.Contains(file)) BuildFilesList.Remove(file);
@@ -142,30 +134,24 @@ namespace AntPanel
             pluginUI.RefreshData();
         }
 
-	    /// <summary>
-	    /// </summary>
-	    /// <param name="file"></param>
-	    /// <param name="target"></param>
 	    public void RunTarget(string file, string target)
         {
-	        string antPath = ((Settings)Settings).AntPath;
-	        string command = Path.Combine(Environment.SystemDirectory, "cmd.exe");
-            string arguments = "/c ";
+	        var antPath = ((Settings)Settings).AntPath;
+            var command = PluginBase.MainForm.CommandPromptExecutable ?? Path.Combine(Environment.SystemDirectory, "cmd.exe");
+            var arguments = "/c ";
             if (string.IsNullOrEmpty(antPath)) arguments += "ant";
             else arguments += Path.Combine(Path.Combine(antPath, "bin"), "ant");
             arguments += $" -buildfile \"{file}\" \"{target}\"";
-            PluginBase.MainForm.CallCommand("RunProcessCaptured", command + ";" + arguments);
+            PluginBase.MainForm.CallCommand("RunProcessCaptured", $"{command};{arguments}");
         }
 
-        /// <summary>
-        /// </summary>
         public void ReadBuildFiles()
         {
             BuildFilesList.Clear();
-            string folder = GetBuildFilesStorageFolder();
-            string fullName = Path.Combine(folder, StorageFileName);
+            var folder = GetBuildFilesStorageFolder();
+            var fullName = Path.Combine(folder, StorageFileName);
             if (!File.Exists(fullName)) return;
-            StreamReader file = new StreamReader(fullName);
+            var file = new StreamReader(fullName);
             string line;
             while ((line = file.ReadLine()) != null)
                 if (!string.IsNullOrEmpty(line) && !BuildFilesList.Contains(line))
@@ -183,9 +169,9 @@ namespace AntPanel
         void InitBasics()
         {
             pluginImage = PluginBase.MainForm.FindImage("486");
-            string dataPath = Path.Combine(PathHelper.DataDir, "AntPanel");
-            if (!Directory.Exists(dataPath)) Directory.CreateDirectory(dataPath);
-            settingFilename = Path.Combine(dataPath, "Settings.fdb");
+            var path = Path.Combine(PathHelper.DataDir, "AntPanel");
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+            settingFilename = Path.Combine(path, "Settings.fdb");
         }
 
         /// <summary>
@@ -193,9 +179,9 @@ namespace AntPanel
         /// </summary>
         void CreateMenuItem()
         {
-            ToolStripMenuItem menuItem = new ToolStripMenuItem("Ant Panel", pluginImage, OpenPanel);
+            var menuItem = new ToolStripMenuItem("Ant Panel", pluginImage, OpenPanel);
             PluginBase.MainForm.RegisterShortcutItem("ViewMenu.ShowAntPanel", menuItem);
-            ToolStripMenuItem menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("ViewMenu");
+            var menu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("ViewMenu");
             menu.DropDownItems.Add(menuItem);
         }
 
@@ -229,22 +215,17 @@ namespace AntPanel
         /// </summary>
         void OpenPanel(object sender, EventArgs e) => pluginPanel.Show();
 
-        /// <summary>
-        /// </summary>
         void SaveBuildFiles()
         {
-            string folder = GetBuildFilesStorageFolder();
-            string fullName = Path.Combine(folder, StorageFileName);
+            var folder = GetBuildFilesStorageFolder();
+            var fullName = Path.Combine(folder, StorageFileName);
             if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
-            StreamWriter file = new StreamWriter(fullName);
-            foreach (string line in BuildFilesList)
+            var file = new StreamWriter(fullName);
+            foreach (var line in BuildFilesList)
                 file.WriteLine(line);
             file.Close();
         }
 
-        /// <summary>
-        /// </summary>
-        /// <returns></returns>
         static string GetBuildFilesStorageFolder() => Path.Combine(Path.GetDirectoryName(PluginBase.CurrentProject.ProjectPath), "obj");
 
         #endregion
@@ -256,7 +237,7 @@ namespace AntPanel
         void OnTreeSelectionChanged()
         {
             if (!(projectTree?.SelectedNode is FileNode)) return;
-            string path = Path.GetFullPath(((FileNode)projectTree.SelectedNode).BackingPath);
+            var path = Path.GetFullPath(((FileNode)projectTree.SelectedNode).BackingPath);
             if (BuildFilesList.Contains(path) || Path.GetExtension(path) != ".xml") return;
             projectTree.ContextMenuStrip.Items.Add(new ToolStripSeparator());
             projectTree.ContextMenuStrip.Items.Add("Add as Ant Build File", pluginImage, OnAddAsAntBuildFile);
@@ -264,7 +245,7 @@ namespace AntPanel
 
         void OnAddAsAntBuildFile(object sender, EventArgs e)
         {
-            string path = Path.GetFullPath(((FileNode)projectTree.SelectedNode).BackingPath);
+            var path = Path.GetFullPath(((FileNode)projectTree.SelectedNode).BackingPath);
             if (BuildFilesList.Contains(path)) return;
             BuildFilesList.Add(path);
             SaveBuildFiles();
