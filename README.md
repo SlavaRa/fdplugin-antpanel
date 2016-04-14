@@ -1,4 +1,4 @@
-AntPanel plugin for FlashDevelop
+AntPanel plugin for [FlashDevelop](http://www.flashdevelop.org)
 ===================
 [![Build status](https://ci.appveyor.com/api/projects/status/o4xf3xo3k7up17ny?svg=true)](https://ci.appveyor.com/project/slavara/fd-antpanel-plugin)
 
