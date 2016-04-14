@@ -97,7 +97,7 @@ namespace AntPanel
             {
                 ShortcutKeys = DelKeys
             });
-            targetMenu = new ContextMenuStrip();
+            targetMenu = new ContextMenuStrip {Renderer = new DockPanelStripRenderer(false)};
             targetMenu.Items.Add(new ToolStripMenuItem("Run target", run.Image, OnMenuRunClick)
             {
                 ShortcutKeyDisplayString = "Enter"
@@ -106,7 +106,7 @@ namespace AntPanel
             {
                 ShortcutKeys = EditKeys
             });
-            errorMenu = new ContextMenuStrip();
+            errorMenu = new ContextMenuStrip {Renderer = new DockPanelStripRenderer(false)};
             errorMenu.Items.Add(new ToolStripMenuItem("Show in Editor", editImage, OnMenuEditClick)
             {
                 ShortcutKeys = EditKeys
