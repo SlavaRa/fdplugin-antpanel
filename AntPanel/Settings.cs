@@ -17,5 +17,10 @@ namespace AntPanel
         [DisplayName("Hide no-description targets"), DefaultValue(false)]
         [Description("Hide targets that don't have a description (unless all of the targets don't have one)")]
         public Boolean SkipHiddenTargets { get; set; }
-    }
+
+		[DisplayName("Additional Arguments")]
+		[Description("More parameters to add to the Ant call (e.g. -inputhandler org.fdorg.ant.input.AntGuiInputHandler)")]
+		[DefaultValue("")]
+		public String AdditionalArgs { get; set; }
+	}
 }
