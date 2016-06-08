@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Canab, SlavaRa")]
 [assembly: AssemblyProduct("AntPanel")]
-[assembly: AssemblyCopyright("FlashDevelop.org 2005-2015")]
+[assembly: AssemblyCopyright(PluginCore.DistroConfig.DISTRIBUTION_COPYRIGHT)]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
