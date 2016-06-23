@@ -137,11 +137,13 @@ namespace AntPanel
 	    public void RunTarget(string file, string target)
         {
 	        var antPath = ((Settings)Settings).AntPath;
+			var addArgs = ((Settings)Settings).AdditionalArgs;
             var command = /*PluginBase.MainForm.CommandPromptExecutable ??*/ Path.Combine(Environment.SystemDirectory, "cmd.exe");
             var arguments = "/c ";
             if (string.IsNullOrEmpty(antPath)) arguments += "ant";
             else arguments += Path.Combine(Path.Combine(antPath, "bin"), "ant");
-            arguments += $" -buildfile \"{file}\" \"{target}\"";
+			if (!string.IsNullOrEmpty(addArgs)) arguments += " " + addArgs;
+			arguments += $" -buildfile \"{file}\" \"{target}\"";
             PluginBase.MainForm.CallCommand("RunProcessCaptured", $"{command};{arguments}");
         }
 
