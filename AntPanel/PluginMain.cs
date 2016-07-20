@@ -16,7 +16,7 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace AntPanel
 {
     public class PluginMain : IPlugin
-	{
+    {
         public readonly List<string> BuildFilesList = new List<string>();
         public string StorageFileName => "antPanelData.txt";
         string settingFilename;
@@ -25,7 +25,7 @@ namespace AntPanel
         DockContent pluginPanel;
         TreeView projectTree;
 
-	    #region Required Properties
+        #region Required Properties
 
         /// <summary>
         /// Api level of the plugin
@@ -62,27 +62,27 @@ namespace AntPanel
         /// </summary>
         [Browsable(false)]
         public object Settings { get; private set; }
-		
-		#endregion
-		
-		#region Required Methods
-		
-		/// <summary>
-		/// Initializes the plugin
-		/// </summary>
-		public void Initialize()
-		{
+        
+        #endregion
+        
+        #region Required Methods
+        
+        /// <summary>
+        /// Initializes the plugin
+        /// </summary>
+        public void Initialize()
+        {
             InitBasics();
             LoadSettings();
             AddEventHandlers();
             CreateMenuItem();
-		    CreatePluginPanel();
+            CreatePluginPanel();
         }
 
-	    /// <summary>
-		/// Disposes the plugin
-		/// </summary>
-		public void Dispose() => SaveSettings();
+        /// <summary>
+        /// Disposes the plugin
+        /// </summary>
+        public void Dispose() => SaveSettings();
 
         /// <summary>
         /// Adds the required event handlers
@@ -93,7 +93,7 @@ namespace AntPanel
         /// Handles the incoming events
         /// </summary>
         public void HandleEvent(object sender, NotifyEvent e, HandlingPriority priority)
-		{
+        {
             switch (e.Type)
             {
                 case EventType.UIStarted:
@@ -113,37 +113,37 @@ namespace AntPanel
                     }
                     break;
             }
-		}
+        }
 
         #endregion
 
         #region Custom Public Methods
 
-	    public void AddBuildFiles(IEnumerable<string> files)
+        public void AddBuildFiles(IEnumerable<string> files)
         {
-	        foreach (var file in files.Where(file => !BuildFilesList.Contains(file)))
-	            BuildFilesList.Add(file);
-	        SaveBuildFiles();
+            foreach (var file in files.Where(file => !BuildFilesList.Contains(file)))
+                BuildFilesList.Add(file);
+            SaveBuildFiles();
             pluginUI.RefreshData();
         }
 
-	    public void RemoveBuildFile(string file)
+        public void RemoveBuildFile(string file)
         {
             if (BuildFilesList.Contains(file)) BuildFilesList.Remove(file);
             SaveBuildFiles();
             pluginUI.RefreshData();
         }
 
-	    public void RunTarget(string file, string target)
+        public void RunTarget(string file, string target)
         {
-	        var antPath = ((Settings)Settings).AntPath;
-			var addArgs = ((Settings)Settings).AdditionalArgs;
+            var antPath = ((Settings)Settings).AntPath;
+            var addArgs = ((Settings)Settings).AdditionalArgs;
             var command = /*PluginBase.MainForm.CommandPromptExecutable ??*/ Path.Combine(Environment.SystemDirectory, "cmd.exe");
-            var arguments = "/c ";
+            var arguments = "/c \"";
             if (string.IsNullOrEmpty(antPath)) arguments += "ant";
-            else arguments += Path.Combine(Path.Combine(antPath, "bin"), "ant");
-			if (!string.IsNullOrEmpty(addArgs)) arguments += " " + addArgs;
-			arguments += $" -buildfile \"{file}\" \"{target}\"";
+            else arguments += "\"" + Path.Combine(Path.Combine(antPath, "bin"), "ant") + "\"";
+            if (!string.IsNullOrEmpty(addArgs)) arguments += " " + addArgs;
+            arguments += $" -buildfile \"{file}\" \"{target}\"\"";
             PluginBase.MainForm.CallCommand("RunProcessCaptured", $"{command};{arguments}");
         }
 
@@ -197,7 +197,7 @@ namespace AntPanel
             pluginPanel = PluginBase.MainForm.CreateDockablePanel(pluginUI, Guid, pluginImage, DockState.DockRight);
         }
 
-	    /// <summary>
+        /// <summary>
         /// Loads the plugin settings
         /// </summary>
         void LoadSettings()
